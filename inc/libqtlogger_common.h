@@ -28,15 +28,17 @@
 
 #pragma once
 
-#include    "libqtlogger_common.h"
+#define ENABLE_LOGGER_LOGGING   (1)
 
-class QtLogger
-{
-public:
-    QtLogger();
-    ~QtLogger();
+#if     defined( _RELEASE )
+#undef  ENABLE_LOGGER_LOGGING
+#define ENABLE_LOGGER_LOGGING   (0)     // forced no debug in release
+#endif
 
-public:
-    void foo( void* );
-};
-
+#ifndef __GNUC__
+#ifdef  _MSC_VER
+#define __PRETTY_FUNCTION__ __FUNCSIG__
+#else
+#define __PRETTY_FUNCTION__ __func__
+#endif
+#endif
