@@ -32,16 +32,22 @@
 
 QtLogger::QtLogger()
 {
+#ifdef _DEBUG
     std::clog << __func__ << std::endl;
+#endif
 }
 
 QtLogger::~QtLogger()
 {
+#ifdef _DEBUG
     std::clog << __func__ << std::endl;
+#endif
 }
 
 void QtLogger::foo( void* bar )
 {
+#ifdef _DEBUG
     std::clog << __func__ << std::endl;
+#endif
 }
 
