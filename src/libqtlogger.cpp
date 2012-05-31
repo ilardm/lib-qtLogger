@@ -32,10 +32,18 @@
 #include    "libqtlogger.h"
 
 QtLogger::QtLogger()
+    : currentLevel( LL_DEBUG )
 {
 #if ENABLE_LOGGER_LOGGING
     std::clog << __PRETTY_FUNCTION__ << std::endl;
 #endif
+
+    ll_string[ LL_EROR      ].sprintf( "ERROR" );
+    ll_string[ LL_WARNING   ].sprintf( "WARN " );
+    ll_string[ LL_LOG       ].sprintf( "LOG  " );
+    ll_string[ LL_DEBUG     ].sprintf( "DEBUG" );
+
+    ll_string[ LL_COUNT     ].sprintf( "     " );
 }
 
 QtLogger::~QtLogger()
@@ -43,6 +51,8 @@ QtLogger::~QtLogger()
 #if ENABLE_LOGGER_LOGGING
     std::clog << __PRETTY_FUNCTION__ << std::endl;
 #endif
+
+    messageQueue.clear();
 }
 
 void QtLogger::foo( void* bar )
@@ -52,3 +62,46 @@ void QtLogger::foo( void* bar )
 #endif
 }
 
+/**
+ *
+ */
+void QtLogger::log(LOG_LEVEL level, QString message)
+{
+#if ENABLE_LOGGER_LOGGING
+    std::clog << __PRETTY_FUNCTION__
+            << " lvl: " << ll_string[ (level>LL_COUNT || level<0)?LL_COUNT:level ].toStdString()
+            << "msg: \"" << message.toStdString() << "\""
+            << std::endl;
+#endif
+
+    if ( level >= LL_COUNT ||
+         level < 0
+    ) {
+#if ENABLE_LOGGER_LOGGING
+        std::cerr << "incorrect log level" << std::endl;
+#endif
+        return;
+    }
+
+    if ( level > currentLevel )
+    {
+#if ENABLE_LOGGER_LOGGING
+        std::clog << "log message rejected: currentLevel: "
+                << ll_string[ currentLevel ].toStdString()
+                << std::endl;
+#endif
+        return;
+    }
+
+    mqMutex.lock();
+    messageQueue.enqueue( message );
+
+#if ENABLE_LOGGER_LOGGING
+    std::clog << "message queue size: "
+            << messageQueue.size()
+            << std::endl;
+#endif
+    mqMutex.unlock();
+
+    return;
+}

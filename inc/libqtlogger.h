@@ -30,13 +30,36 @@
 
 #include    "libqtlogger_common.h"
 
+#include    <QString>
+#include    <QQueue>
+#include    <QMutex>
+
 class QtLogger
 {
+public:
+    typedef enum {
+        LL_EROR,
+        LL_WARNING,
+        LL_LOG,
+        LL_DEBUG,
+
+        LL_COUNT
+    } LOG_LEVEL;
+
 public:
     QtLogger();
     ~QtLogger();
 
 public:
     void foo( void* );
+
+    void log( LOG_LEVEL, QString );
+
+protected:
+    LOG_LEVEL currentLevel;
+    QString ll_string[ LL_COUNT ];
+
+    QQueue< QString > messageQueue;
+    QMutex mqMutex;
 };
 

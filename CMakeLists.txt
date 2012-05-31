@@ -2,15 +2,20 @@ cmake_minimum_required ( VERSION 2.8 )
 project ( libQtLogger )
 set ( TARGET_NAME   "qtLogger" )                        # actual executable name
 
+find_package ( Qt4 REQUIRED )
+
 # define project sources and includes directories
 set ( SOURCES_DIR   "${CMAKE_CURRENT_SOURCE_DIR}/src/" )
 set ( INCLUDES_DIR  "${CMAKE_CURRENT_SOURCE_DIR}/inc/" )
 
 # define includes search path
 include_directories ( ${INCLUDES_DIR}
+                      ${QT_INCLUDES}
                     )
 # define sources search path
 aux_source_directory ( ${SOURCES_DIR} SOURCES )
+# define libraries search path
+link_directories ( ${QT_LIBRARY_DIR} )
 
 # set default build type
 if ( NOT CMAKE_BUILD_TYPE )
@@ -50,4 +55,4 @@ message ( STATUS "${PROJECT_NAME}: c flags: ${CMAKE_C_FLAGS}" )
 message ( STATUS "${PROJECT_NAME}: cxx flags: ${CMAKE_CXX_FLAGS}" )
 
 add_library ( ${TARGET_NAME} SHARED ${SOURCES} )
-
+target_link_libraries ( ${TARGET_NAME} QtCore )
