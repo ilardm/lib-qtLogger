@@ -28,13 +28,21 @@
 
 #pragma once
 
+#include <QtCore/qglobal.h>
+
+#if defined(LIBQTLOGGER_LIBRARY)
+#  define LIBQTLOGGER_EXPORT Q_DECL_EXPORT
+#else
+#  define LIBQTLOGGER_EXPORT Q_DECL_IMPORT
+#endif
+
 #include    "libqtlogger_common.h"
 
 #include    <QString>
 #include    <QQueue>
 #include    <QMutex>
 
-class QtLogger
+class LIBQTLOGGER_EXPORT QtLogger
 {
 public:
     typedef enum {

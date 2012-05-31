@@ -3,6 +3,7 @@ project ( libQtLogger )
 set ( TARGET_NAME   "qtLogger" )                        # actual executable name
 
 find_package ( Qt4 REQUIRED )
+INCLUDE(${QT_USE_FILE})
 
 # define project sources and includes directories
 set ( SOURCES_DIR   "${CMAKE_CURRENT_SOURCE_DIR}/src/" )
@@ -29,13 +30,13 @@ endif ()
 # set common compiler flags
 set ( CFLAGS    "-Wall" )
 set ( CXXFLAGS  "-Wall" )
-set ( DEFINES   "" )
+set ( DEFINES   "-DLIBQTLOGGER_LIBRARY ${QT_DEFINITIONS} -DQT_SHARED" )
 
 # set compiler flags for build type
 if ( CMAKE_BUILD_TYPE STREQUAL "Release" )              # Release
     message ( STATUS "${PROJECT_NAME}: build release" )
 
-    set ( DEFINES   "${DEFINES} -D_RELEASE" )
+    set ( DEFINES   "${DEFINES} -D_RELEASE -DQT_NO_DEBUG" )
 endif()
 if ( CMAKE_BUILD_TYPE STREQUAL "Debug" )                # Debug
     message ( STATUS "${PROJECT_NAME}: build debug" )
@@ -53,6 +54,7 @@ add_definitions ( ${DEFINES} )
 # show flags
 message ( STATUS "${PROJECT_NAME}: c flags: ${CMAKE_C_FLAGS}" )
 message ( STATUS "${PROJECT_NAME}: cxx flags: ${CMAKE_CXX_FLAGS}" )
+message ( STATUS "${PROJECT_NAME}: defines: ${DEFINES}" )
 
 add_library ( ${TARGET_NAME} SHARED ${SOURCES} )
-target_link_libraries ( ${TARGET_NAME} QtCore )
+target_link_libraries ( ${TARGET_NAME} ${QT_LIBRARIES} )
