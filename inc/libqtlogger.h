@@ -35,8 +35,11 @@
 #include    <QString>
 #include    <QQueue>
 #include    <QMutex>
+#include    <QWaitCondition>
+#include    <QThread>
 
 class LIBQTLOGGER_EXPORT QtLogger
+    : public QThread
 {
 public:
     typedef enum {
@@ -60,11 +63,16 @@ public:
     void log( LOG_LEVEL, QString );
 
 protected:
+    void run();
+
+protected:
     LOG_LEVEL currentLevel;
     QString ll_string[ LL_COUNT ];
 
     QQueue< QString > messageQueue;
     QMutex mqMutex;
+    QWaitCondition mqWait;
+    bool shutdown;
 
     QList< LogWriterInterface* > writersList;
     QMutex wlMutex;

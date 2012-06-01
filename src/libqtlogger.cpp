@@ -44,6 +44,8 @@ QtLogger::QtLogger()
     ll_string[ LL_DEBUG     ].sprintf( "DEBUG" );
 
     ll_string[ LL_STUB      ].sprintf( "     " );
+
+    this->start();
 }
 
 QtLogger::~QtLogger()
@@ -52,8 +54,21 @@ QtLogger::~QtLogger()
     std::clog << __PRETTY_FUNCTION__ << std::endl;
 #endif
 
+    mqMutex.lock();
+#if ENABLE_LOGGER_LOGGING
+    std::clog << __PRETTY_FUNCTION__
+            << " messageQueue size: "
+            << messageQueue.size()
+            << std::endl;
+#endif
     messageQueue.clear();
-    
+    shutdown = true;
+
+    mqWait.wakeAll();
+    mqMutex.unlock();
+
+    this->wait();
+
     while ( !writersList.isEmpty() )
     {
         delete( writersList.front() );
@@ -68,6 +83,97 @@ void QtLogger::foo( void* bar )
 #endif
 }
 
+/**
+ *
+ */
+void QtLogger::run()
+{
+#if ENABLE_LOGGER_LOGGING
+    std::clog << __PRETTY_FUNCTION__
+            << " start"
+            << std::endl;
+#endif
+
+    QString message;
+
+    while ( !shutdown )
+    {
+#if ENABLE_LOGGER_LOGGING
+        std::clog << __PRETTY_FUNCTION__
+                << " waiting"
+                << std::endl;
+#endif
+        mqMutex.lock();
+        mqWait.wait( &mqMutex );
+#if ENABLE_LOGGER_LOGGING
+        std::clog << __PRETTY_FUNCTION__
+                << " woken"
+                << std::endl;
+#endif
+
+        if ( !messageQueue.isEmpty() )
+        {
+#if ENABLE_LOGGER_LOGGING
+            std::clog << __PRETTY_FUNCTION__
+                    << " mq.size: "
+                    << messageQueue.size()
+                    << std::endl;
+#endif
+            message = messageQueue.dequeue();
+
+#if ENABLE_LOGGER_LOGGING
+            std::clog << __PRETTY_FUNCTION__
+                    << " pass message \""
+                    << message.toStdString()
+                    << "\" to writers"
+                    << std::endl;
+#endif
+        }
+#if ENABLE_LOGGER_LOGGING
+        else
+        {
+            std::clog << __PRETTY_FUNCTION__
+                    << " message queue is empty"
+                    << std::endl;
+        }
+#endif
+
+        if ( !message.isEmpty() )
+        {
+            wlMutex.lock();
+            if ( !writersList.isEmpty() )
+            {
+                QListIterator<LogWriterInterface*> iter( writersList );
+                while ( iter.hasNext() )
+                {
+                    LogWriterInterface* writer = iter.next();
+                    bool status = writer->writeLog( message );
+
+#if ENABLE_LOGGER_LOGGING
+                    std::clog << __PRETTY_FUNCTION__
+                            << QString().sprintf( " writer @ %p returned %c",
+                                                  writer,
+                                                  (status?'t':'F')
+                                                ).toStdString()
+                            << std::endl;
+#endif
+                }
+            }
+            wlMutex.unlock();
+        }
+
+        mqMutex.unlock();
+    }
+
+#if ENABLE_LOGGER_LOGGING
+    std::clog << __PRETTY_FUNCTION__
+            << " end"
+            << std::endl;
+#endif
+
+    this->quit();
+}
+
 bool QtLogger::addWriter( LogWriterInterface* writer )
 {
 #if ENABLE_LOGGER_LOGGING
@@ -80,7 +186,9 @@ bool QtLogger::addWriter( LogWriterInterface* writer )
     if ( !writer )
     {
 #if ENABLE_LOGGER_LOGGING
-        std::cerr << "NULL writer" << std::endl;
+        std::cerr << __PRETTY_FUNCTION__
+                << " NULL writer"
+                << std::endl;
 #endif
         return false;
     }
@@ -89,7 +197,8 @@ bool QtLogger::addWriter( LogWriterInterface* writer )
    writersList.append( writer );
 
 #if ENABLE_LOGGER_LOGGING
-    std::clog << "wl.size: "
+    std::clog << __PRETTY_FUNCTION__
+            << " wl.size: "
             << writersList.size()
             << std::endl;
 #endif
@@ -114,7 +223,9 @@ void QtLogger::log(LOG_LEVEL level, QString message)
          level < 0
     ) {
 #if ENABLE_LOGGER_LOGGING
-        std::cerr << "incorrect log level" << std::endl;
+        std::cerr << __PRETTY_FUNCTION__
+                << "incorrect log level"
+                << std::endl;
 #endif
         return;
     }
@@ -122,7 +233,8 @@ void QtLogger::log(LOG_LEVEL level, QString message)
     if ( level > currentLevel )
     {
 #if ENABLE_LOGGER_LOGGING
-        std::clog << "log message rejected: currentLevel: "
+        std::clog << __PRETTY_FUNCTION__
+                << " log message rejected: currentLevel: "
                 << ll_string[ currentLevel ].toStdString()
                 << std::endl;
 #endif
@@ -133,10 +245,13 @@ void QtLogger::log(LOG_LEVEL level, QString message)
     messageQueue.enqueue( message );
 
 #if ENABLE_LOGGER_LOGGING
-    std::clog << "message queue size: "
+    std::clog << __PRETTY_FUNCTION__
+            << " message queue size: "
             << messageQueue.size()
             << std::endl;
 #endif
+
+    mqWait.wakeAll();
     mqMutex.unlock();
 
     return;
