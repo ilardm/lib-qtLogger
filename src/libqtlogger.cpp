@@ -111,7 +111,7 @@ void QtLogger::run()
                 << std::endl;
 #endif
 
-        if ( !messageQueue.isEmpty() )
+        while ( !messageQueue.isEmpty() )
         {
 #if ENABLE_LOGGER_LOGGING
             std::clog << FUNCTION_NAME
@@ -128,40 +128,30 @@ void QtLogger::run()
                     << "\" to writers"
                     << std::endl;
 #endif
-        }
-#if ENABLE_LOGGER_LOGGING
-        else
-        {
-            std::clog << FUNCTION_NAME
-                    << " message queue is empty"
-                    << std::endl;
-        }
-#endif
-
-        if ( !message.isEmpty() )
-        {
-            wlMutex.lock();
-            if ( !writersList.isEmpty() )
+            if ( !message.isEmpty() )
             {
-                QListIterator<LogWriterInterface*> iter( writersList );
-                while ( iter.hasNext() )
+                wlMutex.lock();
+                if ( !writersList.isEmpty() )
                 {
-                    LogWriterInterface* writer = iter.next();
-                    bool status = writer->writeLog( message );
+                    QListIterator<LogWriterInterface*> iter( writersList );
+                    while ( iter.hasNext() )
+                    {
+                        LogWriterInterface* writer = iter.next();
+                        bool status = writer->writeLog( message );
 
 #if ENABLE_LOGGER_LOGGING
-                    std::clog << FUNCTION_NAME
-                            << QString().sprintf( " writer @ %p returned %c",
-                                                  writer,
-                                                  (status?'t':'F')
-                                                ).toStdString()
-                            << std::endl;
+                        std::clog << FUNCTION_NAME
+                                << QString().sprintf( " writer @ %p returned %c",
+                                                      writer,
+                                                      (status?'t':'F')
+                                                    ).toStdString()
+                                << std::endl;
 #endif
+                    }
                 }
+                wlMutex.unlock();
             }
-            wlMutex.unlock();
         }
-
         mqMutex.unlock();
     }
 
