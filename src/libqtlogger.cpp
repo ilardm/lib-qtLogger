@@ -43,7 +43,7 @@ QtLogger::QtLogger()
     ll_string[ LL_LOG       ].sprintf( "LOG  " );
     ll_string[ LL_DEBUG     ].sprintf( "DEBUG" );
 
-    ll_string[ LL_COUNT     ].sprintf( "     " );
+    ll_string[ LL_STUB      ].sprintf( "     " );
 }
 
 QtLogger::~QtLogger()
@@ -69,12 +69,12 @@ void QtLogger::log(LOG_LEVEL level, QString message)
 {
 #if ENABLE_LOGGER_LOGGING
     std::clog << __PRETTY_FUNCTION__
-            << " lvl: " << ll_string[ (level>LL_COUNT || level<0)?LL_COUNT:level ].toStdString()
-            << "msg: \"" << message.toStdString() << "\""
+            << " lvl: " << ll_string[ (level>=LL_STUB || level<0)?LL_STUB:level ].toStdString()
+            << " msg: \"" << message.toStdString() << "\""
             << std::endl;
 #endif
 
-    if ( level >= LL_COUNT ||
+    if ( level >= LL_STUB ||
          level < 0
     ) {
 #if ENABLE_LOGGER_LOGGING

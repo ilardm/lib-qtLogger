@@ -51,6 +51,7 @@ public:
         LL_LOG,
         LL_DEBUG,
 
+        LL_STUB,
         LL_COUNT
     } LOG_LEVEL;
 
