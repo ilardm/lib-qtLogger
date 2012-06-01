@@ -35,24 +35,24 @@ ConsoleAppender::ConsoleAppender()
     : LogWriterInterface()
 {
 #if ENABLE_LOGGER_LOGGING
-    std::clog << __PRETTY_FUNCTION__ << std::endl;
+    std::clog << FUNCTION_NAME << std::endl;
 #endif
 }
 
 ConsoleAppender::~ConsoleAppender()
 {
 #if ENABLE_LOGGER_LOGGING
-    std::clog << __PRETTY_FUNCTION__ << std::endl;
+    std::clog << FUNCTION_NAME << std::endl;
 #endif
 }
 
 bool ConsoleAppender::writeLog( QString& message )
 {
 #if ENABLE_LOGGER_LOGGING
-    std::clog << __PRETTY_FUNCTION__ << std::endl;
+    std::clog << FUNCTION_NAME << std::endl;
 #endif
 
-    std::clog << message.toStdString() << std::endl;   
+    std::clog << message.toStdString() << std::endl;
 
     return true;
 }

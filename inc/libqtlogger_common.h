@@ -45,8 +45,10 @@
 
 #ifndef __GNUC__
 #ifdef  _MSC_VER
-#define __PRETTY_FUNCTION__ __FUNCSIG__
+#define FUNCTION_NAME           __FUNCSIG__
 #else
-#define __PRETTY_FUNCTION__ __func__
+#define FUNCTION_NAME           __func__
 #endif
+#else
+#define FUNCTION_NAME           __PRETTY_FUNCTION__
 #endif
