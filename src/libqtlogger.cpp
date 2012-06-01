@@ -110,17 +110,22 @@ void QtLogger::run()
                 << " woken"
                 << std::endl;
 #endif
-
-        while ( !messageQueue.isEmpty() )
+        if ( !messageQueue.isEmpty() )
         {
-#if ENABLE_LOGGER_LOGGING
-            std::clog << FUNCTION_NAME
-                    << " mq.size: "
-                    << messageQueue.size()
-                    << std::endl;
-#endif
             message = messageQueue.dequeue();
+        }
+#if ENABLE_LOGGER_LOGGING
+        else
+        {
+            std::clog << FUNCTION_NAME
+                    << " queue already empty"
+                    << std::endl;
+        }
+#endif
+        mqMutex.unlock();
 
+        while ( !message.isEmpty() )
+        {
 #if ENABLE_LOGGER_LOGGING
             std::clog << FUNCTION_NAME
                     << " pass message \""
@@ -128,31 +133,39 @@ void QtLogger::run()
                     << "\" to writers"
                     << std::endl;
 #endif
-            if ( !message.isEmpty() )
+
+            wlMutex.lock();
+            if ( !writersList.isEmpty() )
             {
-                wlMutex.lock();
-                if ( !writersList.isEmpty() )
+                QListIterator<LogWriterInterface*> iter( writersList );
+                while ( iter.hasNext() )
                 {
-                    QListIterator<LogWriterInterface*> iter( writersList );
-                    while ( iter.hasNext() )
-                    {
-                        LogWriterInterface* writer = iter.next();
-                        bool status = writer->writeLog( message );
+                    LogWriterInterface* writer = iter.next();
+                    bool status = writer->writeLog( message );
 
 #if ENABLE_LOGGER_LOGGING
-                        std::clog << FUNCTION_NAME
-                                << QString().sprintf( " writer @ %p returned %c",
-                                                      writer,
-                                                      (status?'t':'F')
-                                                    ).toStdString()
-                                << std::endl;
+                    std::clog << FUNCTION_NAME
+                            << QString().sprintf( " writer @ %p returned %c",
+                                                  writer,
+                                                  (status?'t':'F')
+                                                ).toStdString()
+                            << std::endl;
 #endif
-                    }
                 }
-                wlMutex.unlock();
             }
+            wlMutex.unlock();
+
+            mqMutex.lock();
+            if ( !messageQueue.isEmpty() )
+            {
+                message = messageQueue.dequeue();
+            }
+            else
+            {
+                message.clear();
+            }
+            mqMutex.unlock();
         }
-        mqMutex.unlock();
     }
 
 #if ENABLE_LOGGER_LOGGING
