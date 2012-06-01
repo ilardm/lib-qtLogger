@@ -28,6 +28,14 @@
 
 #pragma once
 
+#include <QtCore/qglobal.h>
+
+#if defined(LIBQTLOGGER_LIBRARY)
+#  define LIBQTLOGGER_EXPORT Q_DECL_EXPORT
+#else
+#  define LIBQTLOGGER_EXPORT Q_DECL_IMPORT
+#endif
+
 #define ENABLE_LOGGER_LOGGING   (1)
 
 #if     defined( _RELEASE )

@@ -26,47 +26,33 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#pragma once
-
+#include    <iostream>
 
 #include    "libqtlogger_common.h"
-#include    "logwriterinterface.h"
+#include    "consoleappender.h"
 
-#include    <QString>
-#include    <QQueue>
-#include    <QMutex>
-
-class LIBQTLOGGER_EXPORT QtLogger
+ConsoleAppender::ConsoleAppender()
+    : LogWriterInterface()
 {
-public:
-    typedef enum {
-        LL_EROR,
-        LL_WARNING,
-        LL_LOG,
-        LL_DEBUG,
+#if ENABLE_LOGGER_LOGGING
+    std::clog << __PRETTY_FUNCTION__ << std::endl;
+#endif
+}
 
-        LL_STUB,
-        LL_COUNT
-    } LOG_LEVEL;
+ConsoleAppender::~ConsoleAppender()
+{
+#if ENABLE_LOGGER_LOGGING
+    std::clog << __PRETTY_FUNCTION__ << std::endl;
+#endif
+}
 
-public:
-    QtLogger();
-    ~QtLogger();
+bool ConsoleAppender::writeLog( QString& message )
+{
+#if ENABLE_LOGGER_LOGGING
+    std::clog << __PRETTY_FUNCTION__ << std::endl;
+#endif
 
-public:
-    void foo( void* );
+    std::clog << message.toStdString() << std::endl;   
 
-    bool addWriter( LogWriterInterface* );
-    void log( LOG_LEVEL, QString );
-
-protected:
-    LOG_LEVEL currentLevel;
-    QString ll_string[ LL_COUNT ];
-
-    QQueue< QString > messageQueue;
-    QMutex mqMutex;
-
-    QList< LogWriterInterface* > writersList;
-    QMutex wlMutex;
-};
-
+    return true;
+}

@@ -28,45 +28,16 @@
 
 #pragma once
 
-
 #include    "libqtlogger_common.h"
-#include    "logwriterinterface.h"
 
 #include    <QString>
-#include    <QQueue>
-#include    <QMutex>
 
-class LIBQTLOGGER_EXPORT QtLogger
+class LIBQTLOGGER_EXPORT LogWriterInterface
 {
 public:
-    typedef enum {
-        LL_EROR,
-        LL_WARNING,
-        LL_LOG,
-        LL_DEBUG,
-
-        LL_STUB,
-        LL_COUNT
-    } LOG_LEVEL;
+    LogWriterInterface();
+    virtual ~LogWriterInterface();
 
 public:
-    QtLogger();
-    ~QtLogger();
-
-public:
-    void foo( void* );
-
-    bool addWriter( LogWriterInterface* );
-    void log( LOG_LEVEL, QString );
-
-protected:
-    LOG_LEVEL currentLevel;
-    QString ll_string[ LL_COUNT ];
-
-    QQueue< QString > messageQueue;
-    QMutex mqMutex;
-
-    QList< LogWriterInterface* > writersList;
-    QMutex wlMutex;
+    virtual bool writeLog( QString& ) = 0;
 };
-

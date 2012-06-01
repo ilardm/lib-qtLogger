@@ -53,6 +53,12 @@ QtLogger::~QtLogger()
 #endif
 
     messageQueue.clear();
+    
+    while ( !writersList.isEmpty() )
+    {
+        delete( writersList.front() );
+        writersList.pop_front();
+    }
 }
 
 void QtLogger::foo( void* bar )
@@ -60,6 +66,36 @@ void QtLogger::foo( void* bar )
 #if ENABLE_LOGGER_LOGGING
     std::clog << __PRETTY_FUNCTION__ << std::endl;
 #endif
+}
+
+bool QtLogger::addWriter( LogWriterInterface* writer )
+{
+#if ENABLE_LOGGER_LOGGING
+    std::clog << __PRETTY_FUNCTION__
+            << " writer: "
+            << (writer?(QString().sprintf( "%p", writer ).toStdString()):"(null)")
+            << std::endl;
+#endif
+
+    if ( !writer )
+    {
+#if ENABLE_LOGGER_LOGGING
+        std::cerr << "NULL writer" << std::endl;
+#endif
+        return false;
+    }
+
+   wlMutex.lock();
+   writersList.append( writer );
+
+#if ENABLE_LOGGER_LOGGING
+    std::clog << "wl.size: "
+            << writersList.size()
+            << std::endl;
+#endif
+    wlMutex.unlock();
+
+    return true;
 }
 
 /**
