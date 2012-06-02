@@ -38,12 +38,15 @@ QtLogger::QtLogger()
     std::clog << FUNCTION_NAME << std::endl;
 #endif
 
-    ll_string[ LL_ERROR     ].sprintf( "ERROR" );
-    ll_string[ LL_WARNING   ].sprintf( "WARN " );
-    ll_string[ LL_LOG       ].sprintf( "LOG  " );
-    ll_string[ LL_DEBUG     ].sprintf( "DEBUG" );
+    ll_string[ LL_ERROR         ].sprintf( "ERROR " );
+    ll_string[ LL_WARNING       ].sprintf( "WARN  " );
+    ll_string[ LL_WARNING_FINE  ].sprintf( "WARN+ " );
+    ll_string[ LL_LOG           ].sprintf( "log   " );
+    ll_string[ LL_LOG_FINE      ].sprintf( "log+  " );
+    ll_string[ LL_DEBUG         ].sprintf( "debug " );
+    ll_string[ LL_DEBUG_FINE    ].sprintf( "debug+" );
 
-    ll_string[ LL_STUB      ].sprintf( "     " );
+    ll_string[ LL_STUB          ].sprintf( "      " );
 
     messageQueue.enqueue(
             QString("logger startup: %1").arg(

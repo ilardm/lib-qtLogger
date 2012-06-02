@@ -47,8 +47,11 @@ public:
     typedef enum {
         LL_ERROR,
         LL_WARNING,
+        LL_WARNING_FINE,
         LL_LOG,
+        LL_LOG_FINE,
         LL_DEBUG,
+        LL_DEBUG_FINE,
 
         LL_STUB,
         LL_COUNT
@@ -120,12 +123,27 @@ protected:
 #define LOG_WARNX(fmt, data, datasz, args...)\
     LOG_WRITE( QtLogger::LL_WARNING, fmt, data, datasz , ##args )
 
+#define LOG_WARNF(fmt, args...)\
+    LOG_WRITE( QtLogger::LL_WARNING_FINE, fmt, NULL, 0 , ##args )
+#define LOG_WARNXF(fmt, data, datasz, args...)\
+    LOG_WRITE( QtLogger::LL_WARNING_FINE, fmt, data, datasz , ##args )
+
 #define LOG_LOG(fmt, args...)\
     LOG_WRITE( QtLogger::LL_LOG, fmt, NULL, 0 , ##args )
 #define LOG_LOGX(fmt, data, datasz, args...)\
     LOG_WRITE( QtLogger::LL_LOG, fmt, data, datasz , ##args )
 
+#define LOG_LOGF(fmt, args...)\
+    LOG_WRITE( QtLogger::LL_LOG_FINE, fmt, NULL, 0 , ##args )
+#define LOG_LOGXF(fmt, data, datasz, args...)\
+    LOG_WRITE( QtLogger::LL_LOG_FINE, fmt, data, datasz , ##args )
+
 #define LOG_DEBUG(fmt, args...)\
     LOG_WRITE( QtLogger::LL_DEBUG, fmt, NULL, 0 , ##args )
 #define LOG_DEBUGX(fmt, data, datasz, args...)\
     LOG_WRITE( QtLogger::LL_DEBUG, fmt, data, datasz , ##args )
+
+#define LOG_DEBUGF(fmt, args...)\
+    LOG_WRITE( QtLogger::LL_DEBUG_FINE, fmt, NULL, 0 , ##args )
+#define LOG_DEBUGXF(fmt, data, datasz, args...)\
+    LOG_WRITE( QtLogger::LL_DEBUG_FINE, fmt, data, datasz , ##args )
