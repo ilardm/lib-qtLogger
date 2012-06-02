@@ -33,9 +33,15 @@
 #if defined(LIBQTLOGGER_LIBRARY)
 #  define LIBQTLOGGER_EXPORT Q_DECL_EXPORT
 #else
+/** Qt define for exporting symbols for shared libabry
+ */
 #  define LIBQTLOGGER_EXPORT Q_DECL_IMPORT
 #endif
 
+/** enables/disables console logging of logger itself.
+ *
+ * disabled in Release builds
+ */
 #define ENABLE_LOGGER_LOGGING   (1)
 
 #if     defined( _RELEASE )
@@ -47,6 +53,12 @@
 #ifdef  _MSC_VER
 #define FUNCTION_NAME           __FUNCSIG__
 #else
+/** compiler-specific function signature define.
+ *
+ * wrapper for __func__ as fallback,
+ * __PRETTY_FUNCTION__ if GCC,
+ * __FUNCSIG__ if MSVC
+ */
 #define FUNCTION_NAME           __func__
 #endif
 #else
