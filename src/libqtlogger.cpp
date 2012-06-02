@@ -59,26 +59,6 @@ QtLogger::~QtLogger()
 #if ENABLE_LOGGER_LOGGING
     std::clog << FUNCTION_NAME << std::endl;
 #endif
-
-    mqMutex.lock();
-#if ENABLE_LOGGER_LOGGING
-    std::clog << FUNCTION_NAME
-            << " messageQueue size: "
-            << messageQueue.size()
-            << std::endl;
-#endif
-    shutdown = true;
-
-    mqWait.wakeAll();
-    mqMutex.unlock();
-
-    this->wait();
-
-    while ( !writersList.isEmpty() )
-    {
-        delete( writersList.front() );
-        writersList.pop_front();
-    }
 }
 
 QtLogger& QtLogger::getInstance()
@@ -288,4 +268,47 @@ void QtLogger::log(LOG_LEVEL level, QString message)
     mqMutex.unlock();
 
     return;
+}
+
+void QtLogger::finishLogging()
+{
+#if ENABLE_LOGGER_LOGGING
+    std::clog << FUNCTION_NAME << std::endl;
+#endif
+
+    mqMutex.lock();
+#if ENABLE_LOGGER_LOGGING
+    std::clog << FUNCTION_NAME
+            << " messageQueue size: "
+            << messageQueue.size()
+            << std::endl;
+#endif
+    shutdown = true;
+
+    mqWait.wakeAll();
+    mqMutex.unlock();
+
+#if ENABLE_LOGGER_LOGGING
+    std::clog << FUNCTION_NAME
+            << " wait thread to end"
+            << std::endl;
+#endif
+    this->wait();
+
+#if ENABLE_LOGGER_LOGGING
+    std::clog << FUNCTION_NAME
+            << " cleanup writers list"
+            << std::endl;
+#endif
+    while ( !writersList.isEmpty() )
+    {
+        delete( writersList.front() );
+        writersList.pop_front();
+    }
+
+#if ENABLE_LOGGER_LOGGING
+    std::clog << FUNCTION_NAME
+            << " done"
+            << std::endl;
+#endif
 }

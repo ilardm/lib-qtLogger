@@ -68,6 +68,8 @@ public:
     bool addWriter( LogWriterInterface* );
     void log( LOG_LEVEL, QString );
 
+    void finishLogging();
+
 protected:
     void run();
 
@@ -86,6 +88,9 @@ protected:
 
 #define ADD_LOG_WRITER( writer )\
     QtLogger::getInstance().addWriter( writer )
+
+#define FINISH_LOGGING()\
+    QtLogger::getInstance().finishLogging()
 
 #define FILENAME_FROM_PATH( path )\
     ( rindex(path,'/')?rindex(path,'/')+1:path )
