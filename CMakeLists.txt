@@ -56,5 +56,15 @@ message ( STATUS "${PROJECT_NAME}: c flags: ${CMAKE_C_FLAGS}" )
 message ( STATUS "${PROJECT_NAME}: cxx flags: ${CMAKE_CXX_FLAGS}" )
 message ( STATUS "${PROJECT_NAME}: defines: ${DEFINES}" )
 
+# Doxygen target
+find_package ( Doxygen )
+if ( DOXYGEN_FOUND )
+    add_custom_target ( doc
+        ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+        COMMENT "Generating documentation with Doxygen" VERBATIM
+    )
+endif(DOXYGEN_FOUND)
+
 add_library ( ${TARGET_NAME} SHARED ${SOURCES} )
 target_link_libraries ( ${TARGET_NAME} ${QT_LIBRARIES} )
