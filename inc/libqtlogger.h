@@ -28,6 +28,7 @@
 
 #pragma once
 
+#include    <strings.h>
 
 #include    "libqtlogger_common.h"
 #include    "logwriterinterface.h"
@@ -53,11 +54,15 @@ public:
     } LOG_LEVEL;
 
 public:
-    QtLogger();
+    static QtLogger& getInstance();
     ~QtLogger();
+
+private:
+    QtLogger();
 
 public:
     void foo( void* );
+    QString describeLogLevel( QtLogger::LOG_LEVEL );
 
     bool addWriter( LogWriterInterface* );
     void log( LOG_LEVEL, QString );
@@ -78,3 +83,32 @@ protected:
     QMutex wlMutex;
 };
 
+#define ADD_LOG_WRITER( writer )\
+    QtLogger::getInstance().addWriter( writer )
+
+#define FILENAME_FROM_PATH( path )\
+    ( rindex(path,'/')?rindex(path,'/')+1:path )
+
+#define LOG_WRITE(lvl, fmt, ... )\
+    QtLogger::getInstance().log( lvl,\
+                                 QString().sprintf( "%s %s:%d [%p] %s " fmt,\
+                                                    QtLogger::getInstance().describeLogLevel(lvl).toStdString().c_str(),\
+                                                    FILENAME_FROM_PATH(__FILE__),\
+                                                    __LINE__,\
+                                                    (void*)QThread::currentThreadId(),\
+                                                    FUNCTION_NAME,\
+                                                    __VA_ARGS__\
+                                                  )\
+                               )
+
+#define LOG_ERROR(fmt, ...)\
+    LOG_WRITE( QtLogger::LL_EROR, fmt, __VA_ARGS__ )
+
+#define LOG_WARN(fmt, ...)\
+    LOG_WRITE( QtLogger::LL_WARNING, fmt, __VA_ARGS__ )
+
+#define LOG_LOG(fmt, ...)\
+    LOG_WRITE( QtLogger::LL_LOG, fmt, __VA_ARGS__ )
+
+#define LOG_DEBUG(fmt, ...)\
+    LOG_WRITE( QtLogger::LL_DEBUG, fmt, __VA_ARGS__ )

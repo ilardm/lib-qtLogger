@@ -76,11 +76,33 @@ QtLogger::~QtLogger()
     }
 }
 
+QtLogger& QtLogger::getInstance()
+{
+    static QtLogger _instance;
+
+    return _instance;
+}
+
 void QtLogger::foo( void* bar )
 {
 #if ENABLE_LOGGER_LOGGING
     std::clog << FUNCTION_NAME << std::endl;
 #endif
+}
+
+QString QtLogger::describeLogLevel(QtLogger::LOG_LEVEL level)
+{
+#if ENABLE_LOGGER_LOGGING
+    std::clog << FUNCTION_NAME
+            << " level: "
+            << level
+            << " ("
+            << ll_string[((level>=0 && level<=LL_STUB)?level:LL_STUB)].toStdString()
+            << ")"
+            << std::endl;
+#endif
+
+    return ll_string[ ((level>=0 && level<=LL_STUB) ? level : LL_STUB) ];
 }
 
 /**
