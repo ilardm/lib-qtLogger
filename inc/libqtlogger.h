@@ -45,7 +45,7 @@ class LIBQTLOGGER_EXPORT QtLogger
 {
 public:
     typedef enum {
-        LL_EROR,
+        LL_ERROR,
         LL_WARNING,
         LL_LOG,
         LL_DEBUG,
@@ -104,7 +104,7 @@ protected:
                                )
 
 #define LOG_ERROR(fmt, args...)\
-    LOG_WRITE( QtLogger::LL_EROR, fmt , ##args )
+    LOG_WRITE( QtLogger::LL_ERROR, fmt , ##args )
 
 #define LOG_WARN(fmt, args...)\
     LOG_WRITE( QtLogger::LL_WARNING, fmt , ##args )

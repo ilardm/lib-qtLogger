@@ -38,7 +38,7 @@ QtLogger::QtLogger()
     std::clog << FUNCTION_NAME << std::endl;
 #endif
 
-    ll_string[ LL_EROR      ].sprintf( "ERROR" );
+    ll_string[ LL_ERROR     ].sprintf( "ERROR" );
     ll_string[ LL_WARNING   ].sprintf( "WARN " );
     ll_string[ LL_LOG       ].sprintf( "LOG  " );
     ll_string[ LL_DEBUG     ].sprintf( "DEBUG" );
