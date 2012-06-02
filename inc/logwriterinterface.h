@@ -47,5 +47,13 @@ public:
     virtual ~LogWriterInterface();
 
 public:
+    /** log writer function.
+     *
+     * reimplementing class must overwrite this function
+     * to actual log messages write.
+     *
+     * @return true if log message wrote successfully<br>
+     *         false otherwise
+     */
     virtual bool writeLog( QString& ) = 0;
 };

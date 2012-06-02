@@ -31,6 +31,12 @@
 
 #include    <QString>
 
+/** console log writer class.
+ *
+ * appends log messages to the console
+ *
+ * @author Ilya Arefiev
+ */
 class LIBQTLOGGER_EXPORT ConsoleAppender
     : public LogWriterInterface
 {

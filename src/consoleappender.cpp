@@ -31,6 +31,8 @@
 #include    "libqtlogger_common.h"
 #include    "consoleappender.h"
 
+/** dummy constructor.
+ */
 ConsoleAppender::ConsoleAppender()
     : LogWriterInterface()
 {
@@ -39,6 +41,8 @@ ConsoleAppender::ConsoleAppender()
 #endif
 }
 
+/** dummy destructor.
+ */
 ConsoleAppender::~ConsoleAppender()
 {
 #if ENABLE_LOGGER_LOGGING
@@ -46,6 +50,14 @@ ConsoleAppender::~ConsoleAppender()
 #endif
 }
 
+/** write log implemenmtation.
+ *
+ * appends passed log message to C++ std::clog
+ *
+ * @param message log message
+ *
+ * @return currently true only
+ */
 bool ConsoleAppender::writeLog( QString& message )
 {
 #if ENABLE_LOGGER_LOGGING
