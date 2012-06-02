@@ -29,10 +29,14 @@
 
 #include    "logwriterinterface.h"
 
+/** dummy log writer interface constructor.
+ */
 LogWriterInterface::LogWriterInterface()
 {
 }
 
+/** dummy log writer interface destructor.
+ */
 LogWriterInterface::~LogWriterInterface()
 {
 }

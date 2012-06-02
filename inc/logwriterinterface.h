@@ -32,6 +32,14 @@
 
 #include    <QString>
 
+/** log writer interface.
+ *
+ * defines common interface for particular
+ * log writer
+ * (i.e. #ConsoleAppender or #FileAppender)
+ *
+ * @author Ilya Arefiev
+ */
 class LIBQTLOGGER_EXPORT LogWriterInterface
 {
 public:
