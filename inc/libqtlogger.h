@@ -40,21 +40,40 @@
 #include    <QThread>
 #include    <QDateTime>
 
+/** main logger class.
+ *
+ * Implements sigletone pattern to use C macroses without constructing
+ * object on each QtLogger#log call. Actually constructed on first call
+ * any of macros defined below. Enqueues log messages and wakes up
+ * processor thread which passes enqueued messages to writers
+ * (#LogWriterInterface) registered via #ADD_LOG_WRITER macro. Before
+ * application exit macro #FINISH_LOGGING must be called to correctly
+ * process all passed log messages.
+ *
+ * Inherites QThread.
+ *
+ * @author Iya Arefiev
+ */
 class LIBQTLOGGER_EXPORT QtLogger
     : public QThread
 {
 public:
-    typedef enum {
-        LL_ERROR,
-        LL_WARNING,
-        LL_WARNING_FINE,
-        LL_LOG,
-        LL_LOG_FINE,
-        LL_DEBUG,
-        LL_DEBUG_FINE,
 
-        LL_STUB,
-        LL_COUNT
+    /** available log levels enum.
+     *
+     * ordered by descending priority.
+     */
+    typedef enum {
+        LL_ERROR,           /**< fatal error occured. always present in logs */
+        LL_WARNING,         /**< warns about something */
+        LL_WARNING_FINE,    /**< lower level warnings */
+        LL_LOG,             /**< ordinary logs */
+        LL_LOG_FINE,        /**< lower lovel logs */
+        LL_DEBUG,           /**< debug logging */
+        LL_DEBUG_FINE,      /**< more detailed logging */
+
+        LL_STUB,            /**< not a log level, just a stub for non-level values */
+        LL_COUNT            /**< count of elemens in #ll_string array */
     } LOG_LEVEL;
 
 public:
@@ -78,27 +97,69 @@ protected:
     QString hexData( const void*, const size_t );
 
 protected:
+    /** currently using log level threshold
+     */
     LOG_LEVEL currentLevel;
+    /** array of string representation of #LOG_LEVEL
+     */
     QString ll_string[ LL_COUNT ];
 
+    /** log messages queue
+     */
     QQueue< QString > messageQueue;
+    /** message queue guard
+     */
     QMutex mqMutex;
+    /** logger thread wait condition
+     */
     QWaitCondition mqWait;
+    /** logger thread exit condition
+     */
     bool shutdown;
 
+    /** list of registered log writers
+     */
     QList< LogWriterInterface* > writersList;
+    /** log writers list guard
+     */
     QMutex wlMutex;
 };
 
+/** wrapper for QtLogger#addWriter.
+ *
+ * should be called before any logging appeared
+ */
 #define ADD_LOG_WRITER( writer )\
     QtLogger::getInstance().addWriter( writer )
 
+/** wrapper for QtLogger#finishLogging.
+ *
+ * must be called before ending application execution
+ */
 #define FINISH_LOGGING()\
     QtLogger::getInstance().finishLogging()
 
+/** separate filename from given path.
+ *
+ * searches position of '/' symbol in given
+ * path and returns pointer to the next character.
+ *
+ * uses rindex function from strings.h
+ */
 #define FILENAME_FROM_PATH( path )\
     ( rindex(path,'/')?rindex(path,'/')+1:path )
 
+/** wrapper for QtLogger#log.
+ *
+ * creates log message in following format:<br>
+ * {current_time} {log_level-string} {filename}:{line_number} [{thread_id}] {function_signature} {passed_format}
+ *
+ * @param lvl       #LOG_LEVEL
+ * @param fmt       message format
+ * @param data      pointer to data buffer dumped in hex
+ * @param datasz    size of data buffer
+ * @param args      arguments for fmt
+ */
 #define LOG_WRITE(lvl, fmt, data, datasz, args... )\
     QtLogger::getInstance().log( lvl,\
                                  QString().sprintf( "%s %s %16s:%d\t[%p] %s " fmt,\
@@ -113,37 +174,177 @@ protected:
                                  data, datasz\
                                )
 
+/** wrapper for #LOG_WRITE
+ *
+ * substitudes lvl with QtLogger#LL_ERROR,
+ * data with NULL,
+ * datasz with 0
+ *
+ * allows invoking without arguments
+ *
+ * @param fmt       message format
+ * @param args      arguments for fmt
+ */
 #define LOG_ERROR(fmt, args...)\
     LOG_WRITE( QtLogger::LL_ERROR, fmt, NULL, 0 , ##args )
+/** wrapper for #LOG_WRITE
+ *
+ * substitudes lvl with QtLogger#LL_ERROR
+ *
+ * @param fmt       message format
+ * @param data      pointer to data buffer dumped in hex
+ * @param datasz    size of data buffer
+ * @param args      arguments for fmt
+ */
 #define LOG_ERRORX(fmt, data, datasz, args...)\
     LOG_WRITE( QtLogger::LL_ERROR, fmt, data, datasz , ##args )
 
+/** wrapper for #LOG_WRITE
+ *
+ * substitudes lvl with QtLogger#LL_WARNING,
+ * data with NULL,
+ * datasz with 0
+ *
+ * allows invoking without arguments
+ *
+ * @param fmt       message format
+ * @param args      arguments for fmt
+ */
 #define LOG_WARN(fmt, args...)\
     LOG_WRITE( QtLogger::LL_WARNING, fmt, NULL, 0 , ##args )
+/** wrapper for #LOG_WRITE
+ *
+ * substitudes lvl with QtLogger#LL_WARNING
+ *
+ * @param fmt       message format
+ * @param data      pointer to data buffer dumped in hex
+ * @param datasz    size of data buffer
+ * @param args      arguments for fmt
+ */
 #define LOG_WARNX(fmt, data, datasz, args...)\
     LOG_WRITE( QtLogger::LL_WARNING, fmt, data, datasz , ##args )
 
+/** wrapper for #LOG_WRITE
+ *
+ * substitudes lvl with QtLogger#LL_WARNING_FINE,
+ * data with NULL,
+ * datasz with 0
+ *
+ * allows invoking without arguments
+ *
+ * @param fmt       message format
+ * @param args      arguments for fmt
+ */
 #define LOG_WARNF(fmt, args...)\
     LOG_WRITE( QtLogger::LL_WARNING_FINE, fmt, NULL, 0 , ##args )
+/** wrapper for #LOG_WRITE
+ *
+ * substitudes lvl with QtLogger#LL_WARNING_FINE
+ *
+ * @param fmt       message format
+ * @param data      pointer to data buffer dumped in hex
+ * @param datasz    size of data buffer
+ * @param args      arguments for fmt
+ */
 #define LOG_WARNXF(fmt, data, datasz, args...)\
     LOG_WRITE( QtLogger::LL_WARNING_FINE, fmt, data, datasz , ##args )
 
+/** wrapper for #LOG_WRITE
+ *
+ * substitudes lvl with QtLogger#LL_LOG,
+ * data with NULL,
+ * datasz with 0
+ *
+ * allows invoking without arguments
+ *
+ * @param fmt       message format
+ * @param args      arguments for fmt
+ */
 #define LOG_LOG(fmt, args...)\
     LOG_WRITE( QtLogger::LL_LOG, fmt, NULL, 0 , ##args )
+/** wrapper for #LOG_WRITE
+ *
+ * substitudes lvl with QtLogger#LL_LOG
+ *
+ * @param fmt       message format
+ * @param data      pointer to data buffer dumped in hex
+ * @param datasz    size of data buffer
+ * @param args      arguments for fmt
+ */
 #define LOG_LOGX(fmt, data, datasz, args...)\
     LOG_WRITE( QtLogger::LL_LOG, fmt, data, datasz , ##args )
 
+/** wrapper for #LOG_WRITE
+ *
+ * substitudes lvl with QtLogger#LL_LOG_FINE,
+ * data with NULL,
+ * datasz with 0
+ *
+ * allows invoking without arguments
+ *
+ * @param fmt       message format
+ * @param args      arguments for fmt
+ */
 #define LOG_LOGF(fmt, args...)\
     LOG_WRITE( QtLogger::LL_LOG_FINE, fmt, NULL, 0 , ##args )
+/** wrapper for #LOG_WRITE
+ *
+ * substitudes lvl with QtLogger#LL_LOG_FINE
+ *
+ * @param fmt       message format
+ * @param data      pointer to data buffer dumped in hex
+ * @param datasz    size of data buffer
+ * @param args      arguments for fmt
+ */
 #define LOG_LOGXF(fmt, data, datasz, args...)\
     LOG_WRITE( QtLogger::LL_LOG_FINE, fmt, data, datasz , ##args )
 
+/** wrapper for #LOG_WRITE
+ *
+ * substitudes lvl with QtLogger#LL_DEBUG,
+ * data with NULL,
+ * datasz with 0
+ *
+ * allows invoking without arguments
+ *
+ * @param fmt       message format
+ * @param args      arguments for fmt
+ */
 #define LOG_DEBUG(fmt, args...)\
     LOG_WRITE( QtLogger::LL_DEBUG, fmt, NULL, 0 , ##args )
+/** wrapper for #LOG_WRITE
+ *
+ * substitudes lvl with QtLogger#LL_DEBUG
+ *
+ * @param fmt       message format
+ * @param data      pointer to data buffer dumped in hex
+ * @param datasz    size of data buffer
+ * @param args      arguments for fmt
+ */
 #define LOG_DEBUGX(fmt, data, datasz, args...)\
     LOG_WRITE( QtLogger::LL_DEBUG, fmt, data, datasz , ##args )
 
+/** wrapper for #LOG_WRITE
+ *
+ * substitudes lvl with QtLogger#LL_DEBUG_FINE,
+ * data with NULL,
+ * datasz with 0
+ *
+ * allows invoking without arguments
+ *
+ * @param fmt       message format
+ * @param args      arguments for fmt
+ */
 #define LOG_DEBUGF(fmt, args...)\
     LOG_WRITE( QtLogger::LL_DEBUG_FINE, fmt, NULL, 0 , ##args )
+/** wrapper for #LOG_WRITE
+ *
+ * substitudes lvl with QtLogger#LL_DEBUG_FINE
+ *
+ * @param fmt       message format
+ * @param data      pointer to data buffer dumped in hex
+ * @param datasz    size of data buffer
+ * @param args      arguments for fmt
+ */
 #define LOG_DEBUGXF(fmt, data, datasz, args...)\
     LOG_WRITE( QtLogger::LL_DEBUG_FINE, fmt, data, datasz , ##args )

@@ -31,6 +31,13 @@
 #include    "libqtlogger_common.h"
 #include    "libqtlogger.h"
 
+/** logger object constructor.
+ *
+ * initializes internal QtLogger#currentLevel,
+ * initializes #ll_string array with string represenattion of #LOG_LEVEL,
+ * enqueues startup log message with current date and time,
+ * launches logger thread QtLogger#run
+ */
 QtLogger::QtLogger()
     : currentLevel( LL_DEBUG )
 {
@@ -57,6 +64,10 @@ QtLogger::QtLogger()
     this->start();
 }
 
+/** logger object destructor.
+ *
+ * currently does nothing.
+ */
 QtLogger::~QtLogger()
 {
 #if ENABLE_LOGGER_LOGGING
@@ -64,6 +75,13 @@ QtLogger::~QtLogger()
 #endif
 }
 
+/** singleton logger object constructor.
+ *
+ * constructs static QtLogger object and returns
+ * its reference
+ *
+ * @return reference to static QtLogger object
+ */
 QtLogger& QtLogger::getInstance()
 {
     static QtLogger _instance;
@@ -71,6 +89,10 @@ QtLogger& QtLogger::getInstance()
     return _instance;
 }
 
+/** dummy function.
+ *
+ * does nothing.
+ */
 void QtLogger::foo( void* bar )
 {
 #if ENABLE_LOGGER_LOGGING
@@ -78,6 +100,15 @@ void QtLogger::foo( void* bar )
 #endif
 }
 
+/** converts #LOG_LEVEL value to string representation.
+ *
+ * uses initialized in QtLogger#QtLogger #ll_string array.
+ *
+ * @param level log level to convert
+ *
+ * @return string representation of passed level<br>
+ *         or stub if passed level is out of bounds
+ */
 QString QtLogger::describeLogLevel(QtLogger::LOG_LEVEL level)
 {
 #if ENABLE_LOGGER_LOGGING
@@ -93,8 +124,23 @@ QString QtLogger::describeLogLevel(QtLogger::LOG_LEVEL level)
     return ll_string[ ((level>=0 && level<=LL_STUB) ? level : LL_STUB) ];
 }
 
-/**
+/** logger thread.
  *
+ * runs in infinite loop until QtLogger#shutdown flag is set,
+ * waites on QtLogger#mqWait condition until message added into
+ * QtLogger#messageQueue,
+ * passes all messages in queue to registered log writes from
+ * QtLogger#writersList
+ * and waits again.
+ *
+ * since messages may be enqueued while log writers doing some stuff,
+ * this method executes log writers until queue is empty and only then
+ * goes to sleep on condition.
+ *
+ * twice locking message queue: right after wake up and before going to sleep
+ * to ensure if queue is empty.
+ *
+ * writers list is locked until all writers with current message is executed.
  */
 void QtLogger::run()
 {
@@ -190,6 +236,17 @@ void QtLogger::run()
     this->quit();
 }
 
+/** converts passed data to hex representation.
+ *
+ * uses formatting like hexdump(1) utility
+ *
+ * @param data      data buffer to convert
+ * @param datasz    number of bytes to convert
+ *
+ * @return string representation of passed data<br>
+ *         or blank string if datasize equals 0
+ *         or data pointer equals NULL
+ */
 QString QtLogger::hexData( const void* data, const size_t datasz )
 {
 #if ENABLE_LOGGER_LOGGING
@@ -229,6 +286,15 @@ QString QtLogger::hexData( const void* data, const size_t datasz )
     return result;
 }
 
+/** registers one more log writer object.
+ *
+ * //TODO
+ *
+ * @param writer
+ *
+ * @return true if successfully added<br>
+ *         false otherwise
+ */
 bool QtLogger::addWriter( LogWriterInterface* writer )
 {
 #if ENABLE_LOGGER_LOGGING
@@ -262,8 +328,19 @@ bool QtLogger::addWriter( LogWriterInterface* writer )
     return true;
 }
 
-/**
+/** log passed message.
  *
+ * checks if passed log message level is greater than
+ * QtLogger#currentLevel,
+ * converts passed data into hex string (if any) and
+ * appends it to log message,
+ * enqueues passed log message into QtLogger#messageQueue
+ * and wakesup QtLogger#run thread.
+ *
+ * @param level     message log level
+ * @param message   formed log message
+ * @param data      data to dump in hex if any
+ * @param datasz    size of data to dump
  */
 void QtLogger::log(LOG_LEVEL level, QString message, void* data, size_t datasz)
 {
@@ -318,6 +395,14 @@ void QtLogger::log(LOG_LEVEL level, QString message, void* data, size_t datasz)
     return;
 }
 
+/** finish logging.
+ *
+ * set QtLogger#shutdown flag,
+ * wake up QtLogger#run thread,
+ * waits until it exits,
+ * deletes objects in QtLogger#writersList
+ * and cleans QtLogger#writersList list
+ */
 void QtLogger::finishLogging()
 {
 #if ENABLE_LOGGER_LOGGING
