@@ -89,26 +89,26 @@ protected:
 #define FILENAME_FROM_PATH( path )\
     ( rindex(path,'/')?rindex(path,'/')+1:path )
 
-#define LOG_WRITE(lvl, fmt, ... )\
+#define LOG_WRITE(lvl, fmt, args... )\
     QtLogger::getInstance().log( lvl,\
                                  QString().sprintf( "%s %s:%d [%p] %s " fmt,\
                                                     QtLogger::getInstance().describeLogLevel(lvl).toStdString().c_str(),\
                                                     FILENAME_FROM_PATH(__FILE__),\
                                                     __LINE__,\
                                                     (void*)QThread::currentThreadId(),\
-                                                    FUNCTION_NAME,\
-                                                    __VA_ARGS__\
+                                                    FUNCTION_NAME ,\
+                                                    ##args\
                                                   )\
                                )
 
-#define LOG_ERROR(fmt, ...)\
-    LOG_WRITE( QtLogger::LL_EROR, fmt, __VA_ARGS__ )
+#define LOG_ERROR(fmt, args...)\
+    LOG_WRITE( QtLogger::LL_EROR, fmt , ##args )
 
-#define LOG_WARN(fmt, ...)\
-    LOG_WRITE( QtLogger::LL_WARNING, fmt, __VA_ARGS__ )
+#define LOG_WARN(fmt, args...)\
+    LOG_WRITE( QtLogger::LL_WARNING, fmt , ##args )
 
-#define LOG_LOG(fmt, ...)\
-    LOG_WRITE( QtLogger::LL_LOG, fmt, __VA_ARGS__ )
+#define LOG_LOG(fmt, args...)\
+    LOG_WRITE( QtLogger::LL_LOG, fmt , ##args )
 
-#define LOG_DEBUG(fmt, ...)\
-    LOG_WRITE( QtLogger::LL_DEBUG, fmt, __VA_ARGS__ )
+#define LOG_DEBUG(fmt, args...)\
+    LOG_WRITE( QtLogger::LL_DEBUG, fmt , ##args )

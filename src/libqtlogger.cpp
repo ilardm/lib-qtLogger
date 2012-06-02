@@ -162,7 +162,10 @@ void QtLogger::run()
                 while ( iter.hasNext() )
                 {
                     LogWriterInterface* writer = iter.next();
-                    bool status = writer->writeLog( message );
+#if ENABLE_LOGGER_LOGGING
+                    bool status =
+#endif
+                    writer->writeLog( message );
 
 #if ENABLE_LOGGER_LOGGING
                     std::clog << FUNCTION_NAME
