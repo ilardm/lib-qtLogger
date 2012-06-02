@@ -38,6 +38,7 @@
 #include    <QMutex>
 #include    <QWaitCondition>
 #include    <QThread>
+#include    <QDateTime>
 
 class LIBQTLOGGER_EXPORT QtLogger
     : public QThread
@@ -91,7 +92,8 @@ protected:
 
 #define LOG_WRITE(lvl, fmt, args... )\
     QtLogger::getInstance().log( lvl,\
-                                 QString().sprintf( "%s %s:%d [%p] %s " fmt,\
+                                 QString().sprintf( "%s %s %s:%d [%p] %s " fmt,\
+                                                    QDateTime::currentDateTime().toString("hh:mm:ss.zzz").toStdString().c_str(),\
                                                     QtLogger::getInstance().describeLogLevel(lvl).toStdString().c_str(),\
                                                     FILENAME_FROM_PATH(__FILE__),\
                                                     __LINE__,\

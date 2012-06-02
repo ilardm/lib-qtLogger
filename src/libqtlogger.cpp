@@ -45,6 +45,12 @@ QtLogger::QtLogger()
 
     ll_string[ LL_STUB      ].sprintf( "     " );
 
+    messageQueue.enqueue(
+            QString("logger startup: %1").arg(
+                QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss.zzz")
+                )
+            );
+
     this->start();
 }
 
