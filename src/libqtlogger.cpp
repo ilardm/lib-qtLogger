@@ -61,7 +61,6 @@ QtLogger::~QtLogger()
             << messageQueue.size()
             << std::endl;
 #endif
-    messageQueue.clear();
     shutdown = true;
 
     mqWait.wakeAll();
