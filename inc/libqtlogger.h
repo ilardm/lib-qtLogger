@@ -66,12 +66,13 @@ public:
     QString describeLogLevel( QtLogger::LOG_LEVEL );
 
     bool addWriter( LogWriterInterface* );
-    void log( LOG_LEVEL, QString );
+    void log( LOG_LEVEL, QString, void*, size_t );
 
     void finishLogging();
 
 protected:
     void run();
+    QString hexData( const void*, const size_t );
 
 protected:
     LOG_LEVEL currentLevel;
@@ -95,7 +96,7 @@ protected:
 #define FILENAME_FROM_PATH( path )\
     ( rindex(path,'/')?rindex(path,'/')+1:path )
 
-#define LOG_WRITE(lvl, fmt, args... )\
+#define LOG_WRITE(lvl, fmt, data, datasz, args... )\
     QtLogger::getInstance().log( lvl,\
                                  QString().sprintf( "%s %s %16s:%d\t[%p] %s " fmt,\
                                                     QDateTime::currentDateTime().toString("hh:mm:ss.zzz").toStdString().c_str(),\
@@ -105,17 +106,26 @@ protected:
                                                     (void*)QThread::currentThreadId(),\
                                                     FUNCTION_NAME ,\
                                                     ##args\
-                                                  )\
+                                                  ),\
+                                 data, datasz\
                                )
 
 #define LOG_ERROR(fmt, args...)\
-    LOG_WRITE( QtLogger::LL_ERROR, fmt , ##args )
+    LOG_WRITE( QtLogger::LL_ERROR, fmt, NULL, 0 , ##args )
+#define LOG_ERRORX(fmt, data, datasz, args...)\
+    LOG_WRITE( QtLogger::LL_ERROR, fmt, data, datasz , ##args )
 
 #define LOG_WARN(fmt, args...)\
-    LOG_WRITE( QtLogger::LL_WARNING, fmt , ##args )
+    LOG_WRITE( QtLogger::LL_WARNING, fmt, NULL, 0 , ##args )
+#define LOG_WARNX(fmt, data, datasz, args...)\
+    LOG_WRITE( QtLogger::LL_WARNING, fmt, data, datasz , ##args )
 
 #define LOG_LOG(fmt, args...)\
-    LOG_WRITE( QtLogger::LL_LOG, fmt , ##args )
+    LOG_WRITE( QtLogger::LL_LOG, fmt, NULL, 0 , ##args )
+#define LOG_LOGX(fmt, data, datasz, args...)\
+    LOG_WRITE( QtLogger::LL_LOG, fmt, data, datasz , ##args )
 
 #define LOG_DEBUG(fmt, args...)\
-    LOG_WRITE( QtLogger::LL_DEBUG, fmt , ##args )
+    LOG_WRITE( QtLogger::LL_DEBUG, fmt, NULL, 0 , ##args )
+#define LOG_DEBUGX(fmt, data, datasz, args...)\
+    LOG_WRITE( QtLogger::LL_DEBUG, fmt, data, datasz , ##args )

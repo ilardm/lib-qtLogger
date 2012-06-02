@@ -187,6 +187,45 @@ void QtLogger::run()
     this->quit();
 }
 
+QString QtLogger::hexData( const void* data, const size_t datasz )
+{
+#if ENABLE_LOGGER_LOGGING
+    std::clog << FUNCTION_NAME
+            << " data @"
+            << QString().sprintf( " %p", data ).toStdString()
+            << " size: "
+            << datasz
+            << std::endl;
+#endif
+
+    QString result("\n");
+    quint8* p = (quint8*)data;
+
+    for ( size_t i = 0; i < datasz; i++ )
+    {
+        if ( i % 16 == 0 )
+        {
+            result.append( QString().sprintf( "0x%04X: ", (uint)i ) );
+        }
+
+        if ( i % 2 == 0 )
+        {
+            result.append( QString().sprintf( "%02x", p[i] ) );
+        }
+        else
+        {
+            result.append( QString().sprintf( "%02x ", p[i] ) );
+        }
+
+        if ( (i+1) % 16 == 0)
+        {
+            result.replace( result.length()-1, 1, "\n" );
+        }
+    }
+
+    return result;
+}
+
 bool QtLogger::addWriter( LogWriterInterface* writer )
 {
 #if ENABLE_LOGGER_LOGGING
@@ -223,7 +262,7 @@ bool QtLogger::addWriter( LogWriterInterface* writer )
 /**
  *
  */
-void QtLogger::log(LOG_LEVEL level, QString message)
+void QtLogger::log(LOG_LEVEL level, QString message, void* data, size_t datasz)
 {
 #if ENABLE_LOGGER_LOGGING
     std::clog << FUNCTION_NAME
@@ -252,6 +291,12 @@ void QtLogger::log(LOG_LEVEL level, QString message)
                 << std::endl;
 #endif
         return;
+    }
+
+    if ( data
+         && datasz > 0
+    ) {
+        message.append( hexData( data, datasz ) );
     }
 
     mqMutex.lock();
