@@ -33,6 +33,13 @@
 #include    <QFile>
 #include    <QTextStream>
 
+/** log file appender class.
+ *
+ * creates (if file not exists before) and appends
+ * log messages to file.
+ *
+ * @author Ilya Arefiev
+ */
 class LIBQTLOGGER_EXPORT FileAppender
     : public LogWriterInterface
 {
@@ -44,7 +51,13 @@ public:
     virtual bool writeLog( QString& );
 
 protected:
+    /** log file handle
+     */
     QFile logfile;
+    /** file text stream
+     */
     QTextStream lfStream;
+    /** file and stream succesfully opened flag
+     */
     bool valid;
 };

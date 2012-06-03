@@ -31,6 +31,13 @@
 #include    "libqtlogger_common.h"
 #include    "fileappender.h"
 
+/** log file and stream constructor.
+ *
+ * constructs file handle,
+ * stream from file
+ * and set FileAppender#valid flag if no
+ * error occured
+ */
 FileAppender::FileAppender( QString filename )
     : LogWriterInterface(),
       logfile( filename ),
@@ -75,6 +82,12 @@ FileAppender::FileAppender( QString filename )
 #endif
 }
 
+/** stream destructor.
+ *
+ * appends stream with new line,
+ * flushes stream,
+ * closes log file
+ */
 FileAppender::~FileAppender()
 {
 #if ENABLE_LOGGER_LOGGING
@@ -100,6 +113,16 @@ FileAppender::~FileAppender()
     }
 }
 
+/** log writer implementation
+ *
+ * appends stream with passed log message and
+ * flushes stream
+ *
+ * @param message log message
+ *
+ * @return true if FileAppender#valid is set<br>
+ *         false otherwise
+ */
 bool FileAppender::writeLog( QString& message )
 {
 #if ENABLE_LOGGER_LOGGING
@@ -108,7 +131,6 @@ bool FileAppender::writeLog( QString& message )
 
     if ( valid )
     {
-//        lfStream << message << std::endl;
         lfStream << message << "\n";
         lfStream.flush();
 
