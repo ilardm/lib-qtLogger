@@ -288,12 +288,15 @@ QString QtLogger::hexData( const void* data, const size_t datasz )
 
 /** registers one more log writer object.
  *
- * //TODO
+ * checks passed pointer,
+ * locks QtLogger#wlMutex,
+ * appends pointer to QtLogger#writersList
+ * and unlocks mutex
  *
  * @param writer
  *
  * @return true if successfully added<br>
- *         false otherwise
+ *         false otherwise (i.e. pointer is NULL)
  */
 bool QtLogger::addWriter( LogWriterInterface* writer )
 {
