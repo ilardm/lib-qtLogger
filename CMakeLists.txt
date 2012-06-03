@@ -22,9 +22,9 @@ link_directories ( ${QT_LIBRARY_DIR} )
 if ( NOT CMAKE_BUILD_TYPE )
     message ( STATUS "${PROJECT_NAME}: set default build type" )
 
-    # set ( CMAKE_BUILD_TYPE Release )
+    set ( CMAKE_BUILD_TYPE Release )
     # while in intensive development use debug build type
-    set ( CMAKE_BUILD_TYPE Debug )
+    # set ( CMAKE_BUILD_TYPE Debug )
 endif ()
 
 # set common compiler flags
