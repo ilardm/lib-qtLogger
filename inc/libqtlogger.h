@@ -277,7 +277,7 @@ protected:
                                                     __LINE__,\
                                                     (void*)QThread::currentThreadId(),\
                                                     FUNCTION_NAME ,\
-                                                    __VA_ARGS__\
+                                                    ##__VA_ARGS__\
                                                   ),\
                                  data, datasz\
                                )
