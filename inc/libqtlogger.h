@@ -28,7 +28,7 @@
 
 #pragma once
 
-#include    <strings.h>
+#include    <string.h>
 
 #include    "libqtlogger_common.h"
 #include    "logwriterinterface.h"
@@ -220,8 +220,15 @@ protected:
  *
  * uses rindex function from strings.h
  */
+#if defined ( Q_OS_LINUX )
 #define LQTL_FILENAME_FROM_PATH( path )\
-    ( rindex(path,'/')?rindex(path,'/')+1:path )
+    ( strrchr(path,'/')?strrchr(path,'/')+1:path )
+#elif defined ( Q_OS_WIN32 )
+#define LQTL_FILENAME_FROM_PATH( path )\
+    ( strrchr(path,'\\')?strrchr(path,'\\')+1:path )
+#else
+#error "unsupported platform"
+#endif
 
 /** auxiliary macro to suppress compiler warnings.
  */
@@ -270,7 +277,7 @@ protected:
                                                     __LINE__,\
                                                     (void*)QThread::currentThreadId(),\
                                                     FUNCTION_NAME ,\
-                                                    ##args\
+                                                    __VA_ARGS__\
                                                   ),\
                                  data, datasz\
                                )

@@ -32,8 +32,8 @@ if ( NOT CMAKE_BUILD_TYPE )
 endif ()
 
 # set common compiler flags
-set ( CFLAGS    "-Wall -Werror" )
-set ( CXXFLAGS  "-Wall -Werror" )
+set ( CFLAGS    "-Wall" )
+set ( CXXFLAGS  "-Wall" )
 set ( DEFINES   "-DLIBQTLOGGER_LIBRARY ${QT_DEFINITIONS} -DQT_SHARED" )
 
 # set compiler flags for build type
