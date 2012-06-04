@@ -3,6 +3,7 @@ project ( libQtLogger )
 set ( TARGET_NAME   "qtLogger" )                        # actual executable name
 
 find_package ( Qt4 REQUIRED )
+SET ( QT_DONT_USE_QTGUI 1 )
 INCLUDE(${QT_USE_FILE})
 
 # define project sources and includes directories
