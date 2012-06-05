@@ -28,6 +28,8 @@
 
 #include    <iostream>
 
+#include    <QMapIterator>
+
 #include    "libqtlogger_common.h"
 #include    "libqtlogger.h"
 
@@ -331,6 +333,7 @@ bool QtLogger::addWriter( LogWriterInterface* writer )
     return true;
 }
 
+// TODO: doc
 QtLogger::LOG_LEVEL QtLogger::setModuleLevel( QString module, LOG_LEVEL lvl, bool final )
 {
 #ifdef ENABLE_LOGGER_LOGGING
@@ -344,7 +347,98 @@ QtLogger::LOG_LEVEL QtLogger::setModuleLevel( QString module, LOG_LEVEL lvl, boo
             << std::endl;
 #endif
 
-    return lvl;
+    if ( lvl < 0
+         || lvl >= LL_STUB
+    ) {
+        lvl = currentLevel;
+
+#if ENABLE_LOGGER_LOGGING
+        std::clog << FUNCTION_NAME
+                << " incorrect log level passed. set to default"
+                << std::endl;
+#endif
+    }
+
+    bool insert = false;
+
+    // check if exists
+    const MODULE_LEVEL* mlvl = getModuleLevel( module );
+    if ( !mlvl )
+    {
+        insert = true;
+    }
+    else
+    {
+        // reset if !final
+        if ( mlvl->final )
+        {
+#if ENABLE_LOGGER_LOGGING
+            std::clog << FUNCTION_NAME
+                    << " log level for this module already final. rejected"
+                    << std::endl;
+#endif
+            return mlvl->level;
+        }
+        else
+        {
+#if ENABLE_LOGGER_LOGGING
+            std::clog << FUNCTION_NAME
+                    << " replace existsing log level"
+                    << std::endl;
+#endif
+            delete( mlvl );
+            insert = true;
+        }
+    }
+
+    if ( insert )
+    {
+#if ENABLE_LOGGER_LOGGING
+        std::clog << FUNCTION_NAME
+                << " insert new loglevel for module"
+                << std::endl;
+#endif
+        MODULE_LEVEL* nmlvl = new MODULE_LEVEL();
+        nmlvl->level = lvl;
+        nmlvl->final = final;
+
+        if ( !nmlvl )
+        {
+#if ENABLE_LOGGER_LOGGING
+            std::cerr << FUNCTION_NAME
+                    << " unable to create loglevel for module"
+                    << std::endl;
+#endif
+            return LL_STUB;
+        }
+
+        mmMutex.lock();
+        moduleMap.insert( module, nmlvl );
+        mmMutex.unlock();
+
+        return lvl;
+    }
+
+    return LL_STUB;
+}
+
+// TODO: doc
+const QtLogger::MODULE_LEVEL* QtLogger::getModuleLevel( QString module )
+{
+#ifdef ENABLE_LOGGER_LOGGING
+    std::clog << FUNCTION_NAME
+            << " module: "
+            << module.toStdString()
+            << std::endl;
+#endif
+
+    const MODULE_LEVEL* ret;
+
+    mmMutex.lock();
+    ret = moduleMap.value( module, NULL );
+    mmMutex.unlock();
+
+    return ret;
 }
 
 /** log passed message.
@@ -456,6 +550,18 @@ void QtLogger::finishLogging()
     {
         delete( writersList.front() );
         writersList.pop_front();
+    }
+
+    // TODO: doc
+#if ENABLE_LOGGER_LOGGING
+    std::clog << FUNCTION_NAME
+            << " cleanup moduleMap"
+            << std::endl;
+#endif
+    QMapIterator< QString, MODULE_LEVEL* > iter( moduleMap );
+    while ( iter.hasNext() )
+    {
+        delete( iter.next().value() );
     }
 
 #if ENABLE_LOGGER_LOGGING

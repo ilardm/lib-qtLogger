@@ -94,7 +94,9 @@ public:
     QString describeLogLevel( QtLogger::LOG_LEVEL );
 
     bool addWriter( LogWriterInterface* );
+
     QtLogger::LOG_LEVEL setModuleLevel( QString, LOG_LEVEL, bool=false );
+    const QtLogger::MODULE_LEVEL* getModuleLevel( QString );
 
     void log( LOG_LEVEL, QString, void*, size_t );
 
@@ -132,7 +134,8 @@ protected:
      */
     QMutex wlMutex;
 
-    QMap<QString, MODULE_LEVEL> moduleMap;
+    // TODO: doc
+    QMap< QString, MODULE_LEVEL* > moduleMap;
     QMutex mmMutex;
 };
 
