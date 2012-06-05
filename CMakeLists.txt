@@ -2,7 +2,10 @@ cmake_minimum_required ( VERSION 2.8 )
 project ( libQtLogger )
 set ( TARGET_NAME   "qtLogger" )                        # actual executable name
 
-find_package ( Qt4 REQUIRED )
+find_package ( Qt4 COMPONENTS QtCore )
+if ( NOT QT_QTCORE_FOUND )
+    message ( FATAL_ERROR "QtCore requred for build" )
+endif ()
 SET ( QT_DONT_USE_QTGUI 1 )
 INCLUDE(${QT_USE_FILE})
 
