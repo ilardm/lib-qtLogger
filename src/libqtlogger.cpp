@@ -336,7 +336,7 @@ bool QtLogger::addWriter( LogWriterInterface* writer )
 // TODO: doc
 QtLogger::LOG_LEVEL QtLogger::setModuleLevel( QString module, LOG_LEVEL lvl, bool final )
 {
-#ifdef ENABLE_LOGGER_LOGGING
+#if ENABLE_LOGGER_LOGGING
     std::clog << FUNCTION_NAME
             << " module: "
             << module.toStdString()
@@ -425,7 +425,7 @@ QtLogger::LOG_LEVEL QtLogger::setModuleLevel( QString module, LOG_LEVEL lvl, boo
 // TODO: doc
 const QtLogger::MODULE_LEVEL* QtLogger::getModuleLevel( QString module )
 {
-#ifdef ENABLE_LOGGER_LOGGING
+#if ENABLE_LOGGER_LOGGING
     std::clog << FUNCTION_NAME
             << " module: "
             << module.toStdString()
