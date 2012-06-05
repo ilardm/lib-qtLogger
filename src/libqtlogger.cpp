@@ -455,11 +455,13 @@ const QtLogger::MODULE_LEVEL* QtLogger::getModuleLevel( QString module )
  * @param data      data to dump in hex if any
  * @param datasz    size of data to dump
  */
-void QtLogger::log(LOG_LEVEL level, QString message, void* data, size_t datasz)
+// TODO: doc
+void QtLogger::log(LOG_LEVEL level, QString module, QString message, void* data, size_t datasz)
 {
 #if ENABLE_LOGGER_LOGGING
     std::clog << FUNCTION_NAME
             << " lvl: " << ll_string[ (level>=LL_STUB || level<0)?LL_STUB:level ].toStdString()
+            << " module: \"" << module.toStdString() << "\""
             << " msg: \"" << message.toStdString() << "\""
             << std::endl;
 #endif
@@ -473,6 +475,24 @@ void QtLogger::log(LOG_LEVEL level, QString message, void* data, size_t datasz)
                 << std::endl;
 #endif
         return;
+    }
+
+    const MODULE_LEVEL* mlvl = getModuleLevel( module );
+    if ( mlvl
+         && level > mlvl->level
+    ) {
+#if ENABLE_LOGGER_LOGGING
+        std::clog << FUNCTION_NAME
+                << " log message rejected: moduleLevel: "
+                << ll_string[ mlvl->level ].toStdString()
+                << std::endl;
+#endif
+        return;
+    }
+    else if ( !mlvl )
+    {
+        // set default log level for unknown module
+        setModuleLevel( module, currentLevel );
     }
 
     if ( level > currentLevel )

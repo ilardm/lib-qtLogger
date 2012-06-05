@@ -77,6 +77,7 @@ public:
         LL_COUNT            /**< count of elemens in #ll_string array */
     } LOG_LEVEL;
 
+    // TODO: doc
     typedef struct {
         LOG_LEVEL   level;
         bool        final;
@@ -98,7 +99,7 @@ public:
     QtLogger::LOG_LEVEL setModuleLevel( QString, LOG_LEVEL, bool=false );
     const QtLogger::MODULE_LEVEL* getModuleLevel( QString );
 
-    void log( LOG_LEVEL, QString, void*, size_t );
+    void log( LOG_LEVEL, QString, QString, void*, size_t );
 
     void finishLogging();
 
@@ -179,6 +180,7 @@ protected:
  */
 #define LOG_WRITE(lvl, fmt, data, datasz, args... )\
     QtLogger::getInstance().log( lvl,\
+                                 FILENAME_FROM_PATH(__FILE__),\
                                  QString().sprintf( "%s %s %16s:%d\t[%p] %s " fmt,\
                                                     QDateTime::currentDateTime().toString("hh:mm:ss.zzz").toStdString().c_str(),\
                                                     QtLogger::getInstance().describeLogLevel(lvl).toStdString().c_str(),\
