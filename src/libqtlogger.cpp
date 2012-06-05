@@ -117,13 +117,26 @@ QString QtLogger::determineModule( const char* funcname, const char* filename )
     QString ret( funcname );
     if ( ret.contains("::") )
     {
+        // class
+
         int delim = ret.indexOf("::");
         int space = ret.lastIndexOf( " ", delim );
 
-        ret = ret.mid( space, delim - space );
+        ret = ret.mid( space, delim - space ).append("_class");
+    }
+    else if ( ret.contains("(") )
+    {
+        // function
+
+        int delim = ret.indexOf("(");
+        int space = ret.lastIndexOf( " ", delim );
+
+        ret = ret.mid( space, delim - space ).append("_function");
     }
     else
     {
+        // file
+
         ret = QString( FILENAME_FROM_PATH( filename ) );
     }
 
