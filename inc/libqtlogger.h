@@ -92,6 +92,7 @@ private:
 
 public:
     void foo( void* );
+    static QString determineModule( const char*, const char* );
     QString describeLogLevel( QtLogger::LOG_LEVEL );
 
     bool addWriter( LogWriterInterface* );
@@ -164,8 +165,14 @@ protected:
 #define FILENAME_FROM_PATH( path )\
     ( rindex(path,'/')?rindex(path,'/')+1:path )
 
+#define UNUSED_VARIABLE(var)\
+    ((void)var)
+
+#define DETERMINE_MODULE\
+    QtLogger::determineModule(FUNCTION_NAME, __FILE__)
+
 #define SET_MODULE_LOGLEVEL( name, lvl )\
-    QtLogger::LOG_LEVEL __loglevelFor##name = QtLogger::getInstance().setModuleLevel( QString( FILENAME_FROM_PATH(__FILE__) ), lvl )
+    QtLogger::LOG_LEVEL __loglevelFor##name = QtLogger::getInstance().setModuleLevel( DETERMINE_MODULE, lvl )
 
 /** wrapper for QtLogger#log.
  *
@@ -180,7 +187,7 @@ protected:
  */
 #define LOG_WRITE(lvl, fmt, data, datasz, args... )\
     QtLogger::getInstance().log( lvl,\
-                                 FILENAME_FROM_PATH(__FILE__),\
+                                 DETERMINE_MODULE,\
                                  QString().sprintf( "%s %s %16s:%d\t[%p] %s " fmt,\
                                                     QDateTime::currentDateTime().toString("hh:mm:ss.zzz").toStdString().c_str(),\
                                                     QtLogger::getInstance().describeLogLevel(lvl).toStdString().c_str(),\

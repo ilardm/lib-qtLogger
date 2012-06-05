@@ -102,6 +102,43 @@ void QtLogger::foo( void* bar )
 #endif
 }
 
+// TODO: doc
+QString QtLogger::determineModule( const char* funcname, const char* filename )
+{
+#if ENABLE_LOGGER_LOGGING
+    std::clog << FUNCTION_NAME
+            << " funcname: \""
+            << funcname << "\""
+            << " filename: \""
+            << filename << "\""
+            << std::endl;
+#endif
+
+    QString ret( funcname );
+    if ( ret.contains("::") )
+    {
+        int delim = ret.indexOf("::");
+        int space = ret.lastIndexOf( " ", delim );
+
+        ret = ret.mid( space, delim - space );
+    }
+    else
+    {
+        ret = QString( FILENAME_FROM_PATH( filename ) );
+    }
+
+    ret = ret.trimmed();
+
+#if ENABLE_LOGGER_LOGGING
+    std::clog << FUNCTION_NAME
+            << " module: \""
+            << ret.toStdString() << "\""
+            << std::endl;
+#endif
+
+    return ret;
+}
+
 /** converts #LOG_LEVEL value to string representation.
  *
  * uses initialized in QtLogger#QtLogger #ll_string array.
