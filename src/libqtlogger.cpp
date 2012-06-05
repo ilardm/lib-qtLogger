@@ -29,6 +29,7 @@
 #include    <iostream>
 
 #include    <QMapIterator>
+#include    <QStringList>
 
 #include    "libqtlogger_common.h"
 #include    "libqtlogger.h"
@@ -41,7 +42,8 @@
  * launches logger thread QtLogger#run
  */
 QtLogger::QtLogger()
-    : currentLevel( LL_DEBUG )
+    : currentLevel( LL_DEBUG ),
+      mmMutex(QMutex::Recursive)    // allow loadModuleLevels to lock
 {
 #if ENABLE_LOGGER_LOGGING
     std::clog << FUNCTION_NAME << std::endl;
@@ -489,6 +491,105 @@ const QtLogger::MODULE_LEVEL* QtLogger::getModuleLevel( QString module )
     mmMutex.unlock();
 
     return ret;
+}
+
+// TODO: doc
+bool QtLogger::saveModuleLevels( QTextStream* destination )
+{
+#if ENABLE_LOGGER_LOGGING
+    std::clog << FUNCTION_NAME << std::endl;
+#endif
+
+    if ( !destination )
+    {
+#if ENABLE_LOGGER_LOGGING
+        std::cerr << FUNCTION_NAME
+                << " NULL destination passed"
+                << std::endl;
+#endif
+
+        return false;
+    }
+
+    if ( destination->status() != QTextStream::Ok )
+    {
+#if ENABLE_LOGGER_LOGGING
+        std::cerr << FUNCTION_NAME
+                << " destination status is not OK"
+                << std::endl;
+#endif
+
+        return false;
+    }
+
+    QString line("%1\t%2\n");
+
+    mmMutex.lock();
+    QMapIterator< QString, MODULE_LEVEL* > iter( moduleMap );
+    while ( iter.hasNext() )
+    {
+        iter.next();
+
+        (*destination) << line.arg( iter.key() ).arg( (int)(iter.value()->level) );
+    }
+    mmMutex.unlock();
+    destination->flush();
+
+    return true;
+}
+
+// TODO: doc
+bool QtLogger::loadModuleLevels( QTextStream* source )
+{
+#if ENABLE_LOGGER_LOGGING
+    std::clog << FUNCTION_NAME << std::endl;
+#endif
+
+    if ( !source )
+    {
+#if ENABLE_LOGGER_LOGGING
+        std::cerr << FUNCTION_NAME
+                << " NULL source passed"
+                << std::endl;
+#endif
+
+        return false;
+    }
+
+    if ( source->status() != QTextStream::Ok )
+    {
+#if ENABLE_LOGGER_LOGGING
+        std::cerr << FUNCTION_NAME
+                << " source status is not OK"
+                << std::endl;
+#endif
+
+        return false;
+    }
+
+    QString line("");
+    QStringList linesplit;
+
+    mmMutex.lock();
+    while ( !(line = source->readLine()).isNull() )
+    {
+        linesplit = line.split("\t");
+
+        if ( linesplit.length() < 2 )
+        {
+#if ENABLE_LOGGER_LOGGING
+            std::clog << FUNCTION_NAME
+                    << " incorrect line from config"
+                    << std::endl;
+#endif
+            continue;
+        }
+
+        setModuleLevel( linesplit.at(0), (LOG_LEVEL)(linesplit.at(1).toInt()), true );
+    }
+    mmMutex.unlock();
+
+    return true;
 }
 
 /** log passed message.

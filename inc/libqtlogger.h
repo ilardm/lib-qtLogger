@@ -40,6 +40,7 @@
 #include    <QThread>
 #include    <QDateTime>
 #include    <QMap>
+#include    <QTextStream>
 
 /** main logger class.
  *
@@ -99,6 +100,8 @@ public:
 
     QtLogger::LOG_LEVEL setModuleLevel( QString, LOG_LEVEL, bool=false );
     const QtLogger::MODULE_LEVEL* getModuleLevel( QString );
+    bool saveModuleLevels( QTextStream* );
+    bool loadModuleLevels( QTextStream* );
 
     void log( LOG_LEVEL, QString, QString, void*, size_t );
 
@@ -147,6 +150,12 @@ protected:
  */
 #define ADD_LOG_WRITER( writer )\
     QtLogger::getInstance().addWriter( writer )
+
+#define SAVE_LOG_CONFIG( stream )\
+    QtLogger::getInstance().saveModuleLevels( stream )
+
+#define LOAD_LOG_CONFIG( stream )\
+    QtLogger::getInstance().loadModuleLevels( stream )
 
 /** wrapper for QtLogger#finishLogging.
  *
