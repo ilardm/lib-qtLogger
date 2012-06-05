@@ -331,6 +331,22 @@ bool QtLogger::addWriter( LogWriterInterface* writer )
     return true;
 }
 
+QtLogger::LOG_LEVEL QtLogger::setModuleLevel( QString module, LOG_LEVEL lvl, bool final )
+{
+#ifdef ENABLE_LOGGER_LOGGING
+    std::clog << FUNCTION_NAME
+            << " module: "
+            << module.toStdString()
+            << " level: "
+            << describeLogLevel( lvl ).toStdString()
+            << " final: "
+            << ( final?"T":"f" )
+            << std::endl;
+#endif
+
+    return lvl;
+}
+
 /** log passed message.
  *
  * checks if passed log message level is greater than

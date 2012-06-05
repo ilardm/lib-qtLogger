@@ -39,6 +39,7 @@
 #include    <QWaitCondition>
 #include    <QThread>
 #include    <QDateTime>
+#include    <QMap>
 
 /** main logger class.
  *
@@ -76,6 +77,11 @@ public:
         LL_COUNT            /**< count of elemens in #ll_string array */
     } LOG_LEVEL;
 
+    typedef struct {
+        LOG_LEVEL   level;
+        bool        final;
+    } MODULE_LEVEL;
+
 public:
     static QtLogger& getInstance();
     ~QtLogger();
@@ -88,6 +94,8 @@ public:
     QString describeLogLevel( QtLogger::LOG_LEVEL );
 
     bool addWriter( LogWriterInterface* );
+    QtLogger::LOG_LEVEL setModuleLevel( QString, LOG_LEVEL, bool=false );
+
     void log( LOG_LEVEL, QString, void*, size_t );
 
     void finishLogging();
@@ -123,6 +131,9 @@ protected:
     /** log writers list guard
      */
     QMutex wlMutex;
+
+    QMap<QString, MODULE_LEVEL> moduleMap;
+    QMutex mmMutex;
 };
 
 /** wrapper for QtLogger#addWriter.
@@ -148,6 +159,9 @@ protected:
  */
 #define FILENAME_FROM_PATH( path )\
     ( rindex(path,'/')?rindex(path,'/')+1:path )
+
+#define SET_MODULE_LOGLEVEL( name, lvl )\
+    QtLogger::LOG_LEVEL __loglevelFor##name = QtLogger::getInstance().setModuleLevel( QString( FILENAME_FROM_PATH(__FILE__) ), lvl )
 
 /** wrapper for QtLogger#log.
  *
