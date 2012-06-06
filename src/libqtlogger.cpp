@@ -678,16 +678,16 @@ void QtLogger::log(LOG_LEVEL level, QString module, QString message, void* data,
 #endif
         return;
     }
+    else if ( !mlvl )
+    {
+        // set default log level for unknown module
+        setModuleLevel( module, currentLevel );
+    }
     else
     {
         checkCurrentLogLevel = false;
     }
 
-    if ( !mlvl )
-    {
-        // set default log level for unknown module
-        setModuleLevel( module, currentLevel );
-    }
 
     if ( checkCurrentLogLevel
          && level > currentLevel )
