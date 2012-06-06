@@ -664,6 +664,8 @@ void QtLogger::log(LOG_LEVEL level, QString module, QString message, void* data,
         return;
     }
 
+    bool checkCurrentLogLevel = true;
+
     const MODULE_LEVEL* mlvl = getModuleLevel( module );
     if ( mlvl
          && level > mlvl->level
@@ -676,13 +678,19 @@ void QtLogger::log(LOG_LEVEL level, QString module, QString message, void* data,
 #endif
         return;
     }
-    else if ( !mlvl )
+    else
+    {
+        checkCurrentLogLevel = false;
+    }
+
+    if ( !mlvl )
     {
         // set default log level for unknown module
         setModuleLevel( module, currentLevel );
     }
 
-    if ( level > currentLevel )
+    if ( checkCurrentLogLevel
+         && level > currentLevel )
     {
 #if ENABLE_LOGGER_LOGGING
         std::clog << FUNCTION_NAME
