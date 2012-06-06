@@ -120,23 +120,22 @@ QString QtLogger::determineModule( const char* funcname, const char* filename )
 #endif
 
     QString ret( funcname );
-    if ( ret.contains("::") )
-    {
-        // class
-
-        int delim = ret.indexOf("::");
-        int space = ret.lastIndexOf( " ", delim );
-
-        ret = ret.mid( space, delim - space ).append("_class");
-    }
-    else if ( ret.contains("(") )
+    if ( ret.contains("(") )
     {
         // function
 
         int delim = ret.indexOf("(");
         int space = ret.lastIndexOf( " ", delim );
 
-        ret = ret.mid( space, delim - space ).append("_function");
+        ret = ret.mid( space, delim - space );
+
+        if ( ret.contains( "::" ) )
+        {
+            // class || namespace
+
+            delim = ret.lastIndexOf( "::" );
+            ret = ret.left( delim );
+        }
     }
     else
     {
