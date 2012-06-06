@@ -43,7 +43,10 @@
  */
 QtLogger::QtLogger()
     : currentLevel( LL_DEBUG ),
-      mmMutex(QMutex::Recursive)    // allow loadModuleLevels to lock
+      mmMutex(QMutex::Recursive),    // allow loadModuleLevels to lock
+      configFileName(""),
+      configFile( configFileName ),
+      configStream( &configFile )
 {
 #if ENABLE_LOGGER_LOGGING
     std::clog << FUNCTION_NAME << std::endl;
@@ -494,32 +497,53 @@ const QtLogger::MODULE_LEVEL* QtLogger::getModuleLevel( QString module )
 }
 
 // TODO: doc
-bool QtLogger::saveModuleLevels( QTextStream* destination )
+bool QtLogger::setConfigFileName( const char* filename )
+{
+#if ENABLE_LOGGER_LOGGING
+    std::clog << FUNCTION_NAME
+            << " filename: \""
+            << ( filename?filename:"(null)" ) << "\""
+            << std::endl;
+#endif
+
+    if ( filename )
+    {
+        configFileName = QString( filename );
+
+        return true;
+    }
+
+    return false;
+}
+
+// TODO: doc
+bool QtLogger::saveModuleLevels()
 {
 #if ENABLE_LOGGER_LOGGING
     std::clog << FUNCTION_NAME << std::endl;
 #endif
 
-    if ( !destination )
+    bool status = false;
+    if ( !configFileName.isEmpty() )
     {
+        configFile.setFileName( configFileName );
+        status = configFile.open( QIODevice::WriteOnly
+                         | QIODevice::Text );
+
+        if ( status )
+        {
+            status = ( configStream.status() == QTextStream::Ok );
+        }
+
+        if ( !status )
+        {
 #if ENABLE_LOGGER_LOGGING
-        std::cerr << FUNCTION_NAME
-                << " NULL destination passed"
-                << std::endl;
+            std::cerr << FUNCTION_NAME
+                    << " unable to open config file"
+                    << std::endl;
 #endif
-
-        return false;
-    }
-
-    if ( destination->status() != QTextStream::Ok )
-    {
-#if ENABLE_LOGGER_LOGGING
-        std::cerr << FUNCTION_NAME
-                << " destination status is not OK"
-                << std::endl;
-#endif
-
-        return false;
+            return false;
+        }
     }
 
     QString line("%1\t%2\n");
@@ -530,48 +554,58 @@ bool QtLogger::saveModuleLevels( QTextStream* destination )
     {
         iter.next();
 
-        (*destination) << line.arg( iter.key() ).arg( (int)(iter.value()->level) );
+#if ENABLE_LOGGER_LOGGING
+        std::clog << FUNCTION_NAME
+                << " module: \""
+                << iter.key().toStdString() << "\""
+                << " level: "
+                << (int)(iter.value()->level)
+                << std::endl;
+#endif
+
+        configStream << line.arg( iter.key() ).arg( (int)(iter.value()->level) );
     }
     mmMutex.unlock();
-    destination->flush();
+    configFile.close();
 
     return true;
 }
 
 // TODO: doc
-bool QtLogger::loadModuleLevels( QTextStream* source )
+bool QtLogger::loadModuleLevels()
 {
 #if ENABLE_LOGGER_LOGGING
     std::clog << FUNCTION_NAME << std::endl;
 #endif
 
-    if ( !source )
+    bool status = false;
+    if ( !configFileName.isEmpty() )
     {
+        configFile.setFileName( configFileName );
+        status = configFile.open( QIODevice::ReadOnly
+                         | QIODevice::Text );
+
+        if ( status )
+        {
+            status = ( configStream.status() == QTextStream::Ok );
+        }
+
+        if ( !status )
+        {
 #if ENABLE_LOGGER_LOGGING
-        std::cerr << FUNCTION_NAME
-                << " NULL source passed"
-                << std::endl;
+            std::cerr << FUNCTION_NAME
+                    << " unable to open config file"
+                    << std::endl;
 #endif
-
-        return false;
-    }
-
-    if ( source->status() != QTextStream::Ok )
-    {
-#if ENABLE_LOGGER_LOGGING
-        std::cerr << FUNCTION_NAME
-                << " source status is not OK"
-                << std::endl;
-#endif
-
-        return false;
+            return false;
+        }
     }
 
     QString line("");
     QStringList linesplit;
 
     mmMutex.lock();
-    while ( !(line = source->readLine()).isNull() )
+    while ( !(line = configStream.readLine()).isNull() )
     {
         linesplit = line.split("\t");
 
@@ -588,6 +622,8 @@ bool QtLogger::loadModuleLevels( QTextStream* source )
         setModuleLevel( linesplit.at(0), (LOG_LEVEL)(linesplit.at(1).toInt()), true );
     }
     mmMutex.unlock();
+
+    configFile.close();
 
     return true;
 }
@@ -722,6 +758,13 @@ void QtLogger::finishLogging()
         delete( writersList.front() );
         writersList.pop_front();
     }
+
+#if ENABLE_LOGGER_LOGGING
+    std::clog << FUNCTION_NAME
+            << " saving logger config"
+            << std::endl;
+#endif
+    saveModuleLevels();
 
     // TODO: doc
 #if ENABLE_LOGGER_LOGGING

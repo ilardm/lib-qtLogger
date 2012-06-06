@@ -41,6 +41,8 @@
 #include    <QDateTime>
 #include    <QMap>
 #include    <QTextStream>
+#include    <QFile>
+#include    <QTextStream>
 
 /** main logger class.
  *
@@ -100,8 +102,9 @@ public:
 
     QtLogger::LOG_LEVEL setModuleLevel( QString, LOG_LEVEL, bool=false );
     const QtLogger::MODULE_LEVEL* getModuleLevel( QString );
-    bool saveModuleLevels( QTextStream* );
-    bool loadModuleLevels( QTextStream* );
+    bool setConfigFileName( const char* );
+    bool saveModuleLevels();
+    bool loadModuleLevels();
 
     void log( LOG_LEVEL, QString, QString, void*, size_t );
 
@@ -142,6 +145,10 @@ protected:
     // TODO: doc
     QMap< QString, MODULE_LEVEL* > moduleMap;
     QMutex mmMutex;
+
+    QString configFileName;
+    QFile configFile;
+    QTextStream configStream;
 };
 
 /** wrapper for QtLogger#addWriter.
@@ -151,11 +158,15 @@ protected:
 #define ADD_LOG_WRITER( writer )\
     QtLogger::getInstance().addWriter( writer )
 
-#define SAVE_LOG_CONFIG( stream )\
-    QtLogger::getInstance().saveModuleLevels( stream )
+#define SAVE_LOG_CONFIG\
+    QtLogger::getInstance().saveModuleLevels()
 
-#define LOAD_LOG_CONFIG( stream )\
-    QtLogger::getInstance().loadModuleLevels( stream )
+#define LOAD_LOG_CONFIG\
+    QtLogger::getInstance().loadModuleLevels()
+
+#define START_LOGGING( config )\
+    bool __qtLoggerConfigFileSet = ( QtLogger::getInstance().setConfigFileName( config ) &&\
+                                     QtLogger::getInstance().loadModuleLevels() )
 
 /** wrapper for QtLogger#finishLogging.
  *
