@@ -42,7 +42,7 @@
  * launches logger thread QtLogger#run
  */
 QtLogger::QtLogger()
-    : currentLevel( LL_DEBUG ),
+    : currentLevel( LL_WARNING ),
       mmMutex(QMutex::Recursive),    // allow loadModuleLevels to lock
       configFileName(""),
       configFile( configFileName ),
