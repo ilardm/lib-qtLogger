@@ -132,17 +132,19 @@ void QtLogger::foo( void* bar )
  */
 QString QtLogger::determineModule( const char* funcname, const char* filename )
 {
-// TODO: nullpointer check?
 #if ENABLE_LOGGER_LOGGING
     std::clog << FUNCTION_NAME
             << " funcname: \""
-            << funcname << "\""
+            << ( funcname?funcname:"(null)" ) << "\""
             << " filename: \""
-            << filename << "\""
+            << ( filename?filename:"(null)" ) << "\""
             << std::endl;
 #endif
 
-    QString ret( funcname );
+    // TODO: optimize
+    static char defaultModule[] = "default";
+
+    QString ret( funcname ? funcname : defaultModule );
     if ( ret.contains("(") )
     {
         // function
@@ -164,7 +166,7 @@ QString QtLogger::determineModule( const char* funcname, const char* filename )
     {
         // file
 
-        ret = QString( FILENAME_FROM_PATH( filename ) );
+        ret = QString( filename ? FILENAME_FROM_PATH( filename ) : defaultModule );
     }
 
     ret = ret.trimmed();
