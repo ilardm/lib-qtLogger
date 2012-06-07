@@ -522,27 +522,30 @@ bool QtLogger::saveModuleLevels()
     std::clog << FUNCTION_NAME << std::endl;
 #endif
 
-    bool status = false;
-    if ( !configFileName.isEmpty() )
+    if ( configFileName.isEmpty() )
     {
-        configFile.setFileName( configFileName );
-        status = configFile.open( QIODevice::WriteOnly
-                         | QIODevice::Text );
+        return false;
+    }
 
-        if ( status )
-        {
-            status = ( configStream.status() == QTextStream::Ok );
-        }
+    bool status = false;
 
-        if ( !status )
-        {
+    configFile.setFileName( configFileName );
+    status = configFile.open( QIODevice::WriteOnly
+                     | QIODevice::Text );
+
+    if ( status )
+    {
+        status = ( configStream.status() == QTextStream::Ok );
+    }
+
+    if ( !status )
+    {
 #if ENABLE_LOGGER_LOGGING
-            std::cerr << FUNCTION_NAME
-                    << " unable to open config file"
-                    << std::endl;
+        std::cerr << FUNCTION_NAME
+                << " unable to open config file"
+                << std::endl;
 #endif
-            return false;
-        }
+        return false;
     }
 
     QString line("%1\t%2\n");
@@ -577,27 +580,30 @@ bool QtLogger::loadModuleLevels()
     std::clog << FUNCTION_NAME << std::endl;
 #endif
 
-    bool status = false;
-    if ( !configFileName.isEmpty() )
+    if ( configFileName.isEmpty() )
     {
-        configFile.setFileName( configFileName );
-        status = configFile.open( QIODevice::ReadOnly
-                         | QIODevice::Text );
+        return false;
+    }
 
-        if ( status )
-        {
-            status = ( configStream.status() == QTextStream::Ok );
-        }
+    bool status = false;
 
-        if ( !status )
-        {
+    configFile.setFileName( configFileName );
+    status = configFile.open( QIODevice::ReadOnly
+                     | QIODevice::Text );
+
+    if ( status )
+    {
+        status = ( configStream.status() == QTextStream::Ok );
+    }
+
+    if ( !status )
+    {
 #if ENABLE_LOGGER_LOGGING
-            std::cerr << FUNCTION_NAME
-                    << " unable to open config file"
-                    << std::endl;
+        std::cerr << FUNCTION_NAME
+                << " unable to open config file"
+                << std::endl;
 #endif
-            return false;
-        }
+        return false;
     }
 
     QString line("");
