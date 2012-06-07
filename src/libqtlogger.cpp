@@ -107,9 +107,32 @@ void QtLogger::foo( void* bar )
 #endif
 }
 
-// TODO: doc
+/** decide whether to use file name or class/function as module name.
+ *
+ * uses filename or
+ * namespace or
+ * namespace + class
+ * as module name.
+ *
+ * if called from top-level (i.e. outside #main) --
+ * uses file name as module name.
+ *
+ * if called from #main -- module name = "main".
+ *
+ * if called from fooNameSpace::main() --
+ * module name = "fooNameSpace".
+ *
+ * if called from fooNameSpace::FooClass::fooMethod() --
+ * module name = "fooNameSpace::FooClass".
+ *
+ * @param funcname  should be #FUNCTION_NAME
+ * @param filename  should be __FILE__
+ *
+ * @return module name
+ */
 QString QtLogger::determineModule( const char* funcname, const char* filename )
 {
+// TODO: nullpointer check?
 #if ENABLE_LOGGER_LOGGING
     std::clog << FUNCTION_NAME
             << " funcname: \""
@@ -387,7 +410,18 @@ bool QtLogger::addWriter( LogWriterInterface* writer )
     return true;
 }
 
-// TODO: doc
+/** set log level for module.
+ *
+ * assigns log level for given module.
+ * if log level already set - reassigns it if
+ * not marked as final
+ *
+ * @param module    module name
+ * @param lvl       log level for module
+ * @param final     determines whether further override is allowed
+ *
+ * @return assigned log level for module
+ */
 QtLogger::LOG_LEVEL QtLogger::setModuleLevel( QString module, LOG_LEVEL lvl, bool final )
 {
 #if ENABLE_LOGGER_LOGGING
@@ -476,7 +510,13 @@ QtLogger::LOG_LEVEL QtLogger::setModuleLevel( QString module, LOG_LEVEL lvl, boo
     return LL_STUB;
 }
 
-// TODO: doc
+/** retrieve log level for given module.
+ *
+ * @param module module name
+ *
+ * @return mdule log level structure if log level already assigned to module<br>
+ *         NULL if no module found.
+ */
 const QtLogger::MODULE_LEVEL* QtLogger::getModuleLevel( QString module )
 {
 #if ENABLE_LOGGER_LOGGING
@@ -495,7 +535,13 @@ const QtLogger::MODULE_LEVEL* QtLogger::getModuleLevel( QString module )
     return ret;
 }
 
-// TODO: doc
+/** set logger config file name.
+ *
+ * @param filename config file name
+ *
+ * @return true if not NULL filename<br>
+ *         false otherwise.
+ */
 bool QtLogger::setConfigFileName( const char* filename )
 {
 #if ENABLE_LOGGER_LOGGING
@@ -515,7 +561,15 @@ bool QtLogger::setConfigFileName( const char* filename )
     return false;
 }
 
-// TODO: doc
+/** saves log levels for modles.
+ *
+ * opens logger config file for write-only,
+ * so any changes since last QtLogger#loadModuleLevels
+ * will be lost.
+ *
+ * @return true if successfully saved<br>
+ *         false otherwise
+ */
 bool QtLogger::saveModuleLevels()
 {
 #if ENABLE_LOGGER_LOGGING
@@ -573,7 +627,11 @@ bool QtLogger::saveModuleLevels()
     return true;
 }
 
-// TODO: doc
+/** loads log levels for modules from config.
+ *
+ * @return true if successfully loaded<br>
+ *         false otherwise
+ */
 bool QtLogger::loadModuleLevels()
 {
 #if ENABLE_LOGGER_LOGGING
@@ -635,7 +693,11 @@ bool QtLogger::loadModuleLevels()
 
 /** log passed message.
  *
- * checks if passed log message level is greater than
+ * checks if passed log message level is lesser than
+ * assigned for module,
+ * if no loglevel for module record found - creates
+ * one with QtLogger#currentLevel and checks if
+ * log messae level is lesser than
  * QtLogger#currentLevel,
  * converts passed data into hex string (if any) and
  * appends it to log message,
@@ -643,11 +705,11 @@ bool QtLogger::loadModuleLevels()
  * and wakesup QtLogger#run thread.
  *
  * @param level     message log level
+ * @param module    module name
  * @param message   formed log message
  * @param data      data to dump in hex if any
  * @param datasz    size of data to dump
  */
-// TODO: doc
 void QtLogger::log(LOG_LEVEL level, QString module, QString message, void* data, size_t datasz)
 {
 #if ENABLE_LOGGER_LOGGING
@@ -734,7 +796,9 @@ void QtLogger::log(LOG_LEVEL level, QString module, QString message, void* data,
  * wake up QtLogger#run thread,
  * waits until it exits,
  * deletes objects in QtLogger#writersList
- * and cleans QtLogger#writersList list
+ * and cleans QtLogger#writersList list,
+ * saves og levels for modules
+ * and deletes items in QtLogger#moduleMap
  */
 void QtLogger::finishLogging()
 {
@@ -779,7 +843,6 @@ void QtLogger::finishLogging()
 #endif
     saveModuleLevels();
 
-    // TODO: doc
 #if ENABLE_LOGGER_LOGGING
     std::clog << FUNCTION_NAME
             << " cleanup moduleMap"

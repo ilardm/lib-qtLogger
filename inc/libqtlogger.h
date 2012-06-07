@@ -80,10 +80,11 @@ public:
         LL_COUNT            /**< count of elemens in #ll_string array */
     } LOG_LEVEL;
 
-    // TODO: doc
+    /** auxiliary structure to hold log level for module.
+     */
     typedef struct {
-        LOG_LEVEL   level;
-        bool        final;
+        LOG_LEVEL   level;  /**< log level for module*/
+        bool        final;  /**< determines whether log level may be owerridden */
     } MODULE_LEVEL;
 
 public:
@@ -142,12 +143,21 @@ protected:
      */
     QMutex wlMutex;
 
-    // TODO: doc
+    /** mapping of #LOG_LEVEL to module name
+     */
     QMap< QString, MODULE_LEVEL* > moduleMap;
+    /** #moduleMap guard
+     */
     QMutex mmMutex;
 
+    /** logger config file name.
+     */
     QString configFileName;
+    /** logger config file object.
+     */
     QFile configFile;
+    /** logger config file text stream.
+     */
     QTextStream configStream;
 };
 
@@ -158,12 +168,30 @@ protected:
 #define ADD_LOG_WRITER( writer )\
     QtLogger::getInstance().addWriter( writer )
 
+/** wrapper for QtLogger#saveModuleLevels.
+ */
 #define SAVE_LOG_CONFIG\
     QtLogger::getInstance().saveModuleLevels()
 
+/** wrapper for QtLogger#loadModuleLevels.
+ */
 #define LOAD_LOG_CONFIG\
     QtLogger::getInstance().loadModuleLevels()
 
+/** loads logger config.
+ *
+ * should be called first (even before #main )
+ * to load all log levels for modules.
+ *
+ * defines boolean __qtLoggerConfigFileSet set to
+ * true if filename was set && config file was load
+ * ( by calling QtLogger#setConfigFileName combining
+ * with QtLogger#loadModuleLevels by '&&', so no
+ * config loading if QtLogger#setConfigFileName
+ * returned false ).
+ *
+ * @param config config file name
+ */
 #define START_LOGGING( config )\
     bool __qtLoggerConfigFileSet = ( QtLogger::getInstance().setConfigFileName( config ) &&\
                                      QtLogger::getInstance().loadModuleLevels() )
@@ -185,12 +213,24 @@ protected:
 #define FILENAME_FROM_PATH( path )\
     ( rindex(path,'/')?rindex(path,'/')+1:path )
 
+/** auxiliary macro to suppress compiler warnings.
+ */
 #define UNUSED_VARIABLE(var)\
     ((void)var)
 
+/** wrapper for QtLogger#determineModule.
+ */
 #define DETERMINE_MODULE\
     QtLogger::determineModule(FUNCTION_NAME, __FILE__)
 
+/** wrapper for QtLogger#setModuleLevel.
+ *
+ * defines QtLogger#LOG_LEVEL __logLevelFor{...}
+ * variable. {...} substituded with passed name argument.
+ *
+ * @param name  name for defined variable
+ * @param lvl   log level for current module
+ */
 #define SET_MODULE_LOGLEVEL( name, lvl )\
     QtLogger::LOG_LEVEL __loglevelFor##name = QtLogger::getInstance().setModuleLevel( DETERMINE_MODULE, lvl )
 
