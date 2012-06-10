@@ -218,6 +218,11 @@ protected:
 #define UNUSED_VARIABLE(var)\
     ((void)var)
 
+/** auxiliary macro to convert QString to const char*.
+  */
+#define QSTRINGCHAR( str )\
+    str.toLocal8Bit().constData()
+
 /** wrapper for QtLogger#determineModule.
  */
 #define DETERMINE_MODULE\
