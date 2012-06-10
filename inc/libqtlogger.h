@@ -43,6 +43,7 @@
 #include    <QTextStream>
 #include    <QFile>
 #include    <QTextStream>
+#include    <QSettings>
 
 /** main logger class.
  *
@@ -104,6 +105,7 @@ public:
     QtLogger::LOG_LEVEL setModuleLevel( QString, LOG_LEVEL, bool=false );
     const QtLogger::MODULE_LEVEL* getModuleLevel( QString );
     bool setConfigFileName( const char* );
+    bool setSettingsObject( QSettings* = NULL );
     bool saveModuleLevels();
     bool loadModuleLevels();
 
@@ -162,6 +164,9 @@ protected:
     /** logger config file text stream.
      */
     QTextStream configStream;
+
+    QSettings* settings;
+    QString settingsSection;
 };
 
 /** wrapper for QtLogger#addWriter.
@@ -170,6 +175,9 @@ protected:
  */
 #define ADD_LOG_WRITER( writer )\
     QtLogger::getInstance().addWriter( writer )
+
+#define SET_SETTINGS_OBJECT( settings )\
+    QtLogger::getInstance().setSettingsObject( settings )
 
 /** wrapper for QtLogger#saveModuleLevels.
  */

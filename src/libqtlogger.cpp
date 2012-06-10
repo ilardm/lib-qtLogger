@@ -47,7 +47,9 @@ QtLogger::QtLogger()
       mmMutex(QMutex::Recursive),    // allow loadModuleLevels to lock
       configFileName(""),
       configFile( configFileName ),
-      configStream( &configFile )
+      configStream( &configFile ),
+      settings( NULL ),
+      settingsSection( "logging" )
 {
 #if ENABLE_LOGGER_LOGGING
     std::clog << FUNCTION_NAME << std::endl;
@@ -566,6 +568,24 @@ bool QtLogger::setConfigFileName( const char* filename )
     return false;
 }
 
+bool QtLogger::setSettingsObject( QSettings* settings )
+{
+#if ENABLE_LOGGER_LOGGING
+    std::clog << FUNCTION_NAME
+            << " settings file \""
+            << ( settings?settings->fileName().toStdString().c_str():"(null)" )
+            << std::endl;
+#endif
+
+    if ( settings )
+    {
+        this->settings = settings;
+        return true;
+    }
+
+    return false;
+}
+
 /** saves log levels for modles.
  *
  * opens logger config file for write-only,
@@ -583,6 +603,49 @@ bool QtLogger::saveModuleLevels()
 #if ENABLE_LOGGER_LOGGING
     std::clog << FUNCTION_NAME << std::endl;
 #endif
+
+    if ( settings )
+    {
+#if ENABLE_LOGGER_LOGGING
+        std::clog << FUNCTION_NAME
+                << " using settings object"
+                << std::endl;
+#endif
+        settings->beginGroup( settingsSection );
+        settings->setValue( defaultModuleLevel, (int)(currentLevel) );
+        mmMutex.lock();
+
+        QMapIterator< QString, MODULE_LEVEL* > iter( moduleMap );
+        while ( iter.hasNext() )
+        {
+            iter.next();
+
+#if ENABLE_LOGGER_LOGGING
+            std::clog << FUNCTION_NAME
+                    << " module: \""
+                    << iter.key().toStdString() << "\""
+                    << " level: "
+                    << (int)(iter.value()->level)
+                    << std::endl;
+#endif
+
+//            configStream << line.arg( iter.key() ).arg( (int)(iter.value()->level) );
+            settings->setValue( iter.key(), (int)(iter.value()->level) );
+        }
+        mmMutex.unlock();
+        settings->endGroup();
+        settings->sync();
+
+        return true;
+    }
+    else
+    {
+#if ENABLE_LOGGER_LOGGING
+        std::clog << FUNCTION_NAME
+                << " using old-behaviour"
+                << std::endl;
+#endif
+    }
 
     if ( configFileName.isEmpty() )
     {
