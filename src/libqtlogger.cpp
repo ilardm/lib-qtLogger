@@ -38,6 +38,7 @@
  *
  * initializes internal QtLogger#currentLevel,
  * initializes #ll_string array with string represenattion of #LOG_LEVEL,
+ * initializes QtLogger#defaultModuleLevel with "::default",
  * enqueues startup log message with current date and time,
  * launches logger thread QtLogger#run
  */
@@ -61,6 +62,8 @@ QtLogger::QtLogger()
     ll_string[ LL_DEBUG_FINE    ].sprintf( "debug+" );
 
     ll_string[ LL_STUB          ].sprintf( "      " );
+
+    defaultModuleLevel.sprintf( "::default" );
 
     messageQueue.enqueue(
             QString("logger startup: %1").arg(
@@ -569,6 +572,9 @@ bool QtLogger::setConfigFileName( const char* filename )
  * so any changes since last QtLogger#loadModuleLevels
  * will be lost.
  *
+ * saves also default log level with module name
+ * as set in QtLogger#defaultModuleLevel.
+ *
  * @return true if successfully saved<br>
  *         false otherwise
  */
@@ -606,6 +612,9 @@ bool QtLogger::saveModuleLevels()
 
     QString line("%1\t%2\n");
 
+    // save default log level
+    configStream << line.arg( defaultModuleLevel ).arg( (int)(currentLevel) );
+
     mmMutex.lock();
     QMapIterator< QString, MODULE_LEVEL* > iter( moduleMap );
     while ( iter.hasNext() )
@@ -630,6 +639,9 @@ bool QtLogger::saveModuleLevels()
 }
 
 /** loads log levels for modules from config.
+ *
+ * if QtLogger#defaultModuleLevel found in config file
+ * resets QtLogger#currentLevel to its value
  *
  * @return true if successfully loaded<br>
  *         false otherwise
@@ -684,7 +696,23 @@ bool QtLogger::loadModuleLevels()
             continue;
         }
 
-        setModuleLevel( linesplit.at(0), (LOG_LEVEL)(linesplit.at(1).toInt()), true );
+        // check for default log level
+        if ( linesplit.at(0) == defaultModuleLevel )
+        {
+            currentLevel = (LOG_LEVEL)(linesplit.at(1).toInt());
+
+#if ENABLE_LOGGER_LOGGING
+            std::clog << FUNCTION_NAME
+                    << " current level: "
+                    <<  currentLevel
+                    << std::endl;
+#endif
+        }
+        else
+        {
+            // or add module log level value
+            setModuleLevel( linesplit.at(0), (LOG_LEVEL)(linesplit.at(1).toInt()), true );
+        }
     }
     mmMutex.unlock();
 

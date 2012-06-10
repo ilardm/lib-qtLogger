@@ -116,6 +116,9 @@ protected:
     QString hexData( const void*, const size_t );
 
 protected:
+    /** represents default log level <i>module name</i> in config file
+      */
+    QString defaultModuleLevel;
     /** currently using log level threshold
      */
     LOG_LEVEL currentLevel;
