@@ -270,19 +270,6 @@ protected:
 
 /** wrapper for #LOG_WRITE
  *
- * substitudes lvl with QtLogger#LL_ERROR,
- * data with NULL,
- * datasz with 0
- *
- * allows invoking without arguments
- *
- * @param fmt       message format
- * @param args      arguments for fmt
- */
-#define LOG_ERROR(fmt, args...)\
-    LOG_WRITE( QtLogger::LL_ERROR, fmt, NULL, 0 , ##args )
-/** wrapper for #LOG_WRITE
- *
  * substitudes lvl with QtLogger#LL_ERROR
  *
  * @param fmt       message format
@@ -292,11 +279,9 @@ protected:
  */
 #define LOG_ERRORX(fmt, data, datasz, args...)\
     LOG_WRITE( QtLogger::LL_ERROR, fmt, data, datasz , ##args )
-
-/** wrapper for #LOG_WRITE
+/** wrapper for #LOG_ERRORX
  *
- * substitudes lvl with QtLogger#LL_WARNING,
- * data with NULL,
+ * substitudes data with NULL,
  * datasz with 0
  *
  * allows invoking without arguments
@@ -304,8 +289,9 @@ protected:
  * @param fmt       message format
  * @param args      arguments for fmt
  */
-#define LOG_WARN(fmt, args...)\
-    LOG_WRITE( QtLogger::LL_WARNING, fmt, NULL, 0 , ##args )
+#define LOG_ERROR(fmt, args...)\
+    LOG_ERRORX( fmt, NULL, 0 , ##args )
+
 /** wrapper for #LOG_WRITE
  *
  * substitudes lvl with QtLogger#LL_WARNING
@@ -317,11 +303,9 @@ protected:
  */
 #define LOG_WARNX(fmt, data, datasz, args...)\
     LOG_WRITE( QtLogger::LL_WARNING, fmt, data, datasz , ##args )
-
-/** wrapper for #LOG_WRITE
+/** wrapper for #LOG_WARNX
  *
- * substitudes lvl with QtLogger#LL_WARNING_FINE,
- * data with NULL,
+ * substitudes data with NULL,
  * datasz with 0
  *
  * allows invoking without arguments
@@ -329,8 +313,9 @@ protected:
  * @param fmt       message format
  * @param args      arguments for fmt
  */
-#define LOG_WARNF(fmt, args...)\
-    LOG_WRITE( QtLogger::LL_WARNING_FINE, fmt, NULL, 0 , ##args )
+#define LOG_WARN(fmt, args...)\
+    LOG_WARNX( fmt, NULL, 0 , ##args )
+
 /** wrapper for #LOG_WRITE
  *
  * substitudes lvl with QtLogger#LL_WARNING_FINE
@@ -342,11 +327,9 @@ protected:
  */
 #define LOG_WARNXF(fmt, data, datasz, args...)\
     LOG_WRITE( QtLogger::LL_WARNING_FINE, fmt, data, datasz , ##args )
-
-/** wrapper for #LOG_WRITE
+/** wrapper for #LOG_WARNXF
  *
- * substitudes lvl with QtLogger#LL_LOG,
- * data with NULL,
+ * substitudes data with NULL,
  * datasz with 0
  *
  * allows invoking without arguments
@@ -354,8 +337,9 @@ protected:
  * @param fmt       message format
  * @param args      arguments for fmt
  */
-#define LOG_LOG(fmt, args...)\
-    LOG_WRITE( QtLogger::LL_LOG, fmt, NULL, 0 , ##args )
+#define LOG_WARNF(fmt, args...)\
+    LOG_WARNXF( fmt, NULL, 0 , ##args )
+
 /** wrapper for #LOG_WRITE
  *
  * substitudes lvl with QtLogger#LL_LOG
@@ -367,8 +351,31 @@ protected:
  */
 #define LOG_LOGX(fmt, data, datasz, args...)\
     LOG_WRITE( QtLogger::LL_LOG, fmt, data, datasz , ##args )
+/** wrapper for #LOG_LOGX
+ *
+ * substitudes data with NULL,
+ * datasz with 0
+ *
+ * allows invoking without arguments
+ *
+ * @param fmt       message format
+ * @param args      arguments for fmt
+ */
+#define LOG_LOG(fmt, args...)\
+    LOG_LOGX( fmt, NULL, 0 , ##args )
 
 /** wrapper for #LOG_WRITE
+ *
+ * substitudes lvl with QtLogger#LL_LOG_FINE
+ *
+ * @param fmt       message format
+ * @param data      pointer to data buffer dumped in hex
+ * @param datasz    size of data buffer
+ * @param args      arguments for fmt
+ */
+#define LOG_LOGXF(fmt, data, datasz, args...)\
+    LOG_WRITE( fmt, data, datasz , ##args )
+/** wrapper for #LOG_LOGXF
  *
  * substitudes lvl with QtLogger#LL_LOG_FINE,
  * data with NULL,
@@ -380,32 +387,8 @@ protected:
  * @param args      arguments for fmt
  */
 #define LOG_LOGF(fmt, args...)\
-    LOG_WRITE( QtLogger::LL_LOG_FINE, fmt, NULL, 0 , ##args )
-/** wrapper for #LOG_WRITE
- *
- * substitudes lvl with QtLogger#LL_LOG_FINE
- *
- * @param fmt       message format
- * @param data      pointer to data buffer dumped in hex
- * @param datasz    size of data buffer
- * @param args      arguments for fmt
- */
-#define LOG_LOGXF(fmt, data, datasz, args...)\
-    LOG_WRITE( QtLogger::LL_LOG_FINE, fmt, data, datasz , ##args )
+    LOG_LOGXF( fmt, NULL, 0 , ##args )
 
-/** wrapper for #LOG_WRITE
- *
- * substitudes lvl with QtLogger#LL_DEBUG,
- * data with NULL,
- * datasz with 0
- *
- * allows invoking without arguments
- *
- * @param fmt       message format
- * @param args      arguments for fmt
- */
-#define LOG_DEBUG(fmt, args...)\
-    LOG_WRITE( QtLogger::LL_DEBUG, fmt, NULL, 0 , ##args )
 /** wrapper for #LOG_WRITE
  *
  * substitudes lvl with QtLogger#LL_DEBUG
@@ -417,11 +400,9 @@ protected:
  */
 #define LOG_DEBUGX(fmt, data, datasz, args...)\
     LOG_WRITE( QtLogger::LL_DEBUG, fmt, data, datasz , ##args )
-
-/** wrapper for #LOG_WRITE
+/** wrapper for #LOG_DEBUGX
  *
- * substitudes lvl with QtLogger#LL_DEBUG_FINE,
- * data with NULL,
+ * substitudes data with NULL,
  * datasz with 0
  *
  * allows invoking without arguments
@@ -429,8 +410,9 @@ protected:
  * @param fmt       message format
  * @param args      arguments for fmt
  */
-#define LOG_DEBUGF(fmt, args...)\
-    LOG_WRITE( QtLogger::LL_DEBUG_FINE, fmt, NULL, 0 , ##args )
+#define LOG_DEBUG(fmt, args...)\
+    LOG_DEBUGX( fmt, NULL, 0 , ##args )
+
 /** wrapper for #LOG_WRITE
  *
  * substitudes lvl with QtLogger#LL_DEBUG_FINE
@@ -442,3 +424,15 @@ protected:
  */
 #define LOG_DEBUGXF(fmt, data, datasz, args...)\
     LOG_WRITE( QtLogger::LL_DEBUG_FINE, fmt, data, datasz , ##args )
+/** wrapper for #LOG_DEBUGXF
+ *
+ * substitudes data with NULL,
+ * datasz with 0
+ *
+ * allows invoking without arguments
+ *
+ * @param fmt       message format
+ * @param args      arguments for fmt
+ */
+#define LOG_DEBUGF(fmt, args...)\
+    LOG_DEBUGXF( fmt, NULL, 0 , ##args )
