@@ -31,12 +31,14 @@
 #include    "libqtlogger_common.h"
 #include    "consoleappender.h"
 
+using namespace ilardm::lib::qtlogger;
+
 /** dummy constructor.
  */
 ConsoleAppender::ConsoleAppender()
     : LogWriterInterface()
 {
-#if ENABLE_LOGGER_LOGGING
+#if LQTL_ENABLE_LOGGER_LOGGING
     std::clog << FUNCTION_NAME << std::endl;
 #endif
 }
@@ -45,7 +47,7 @@ ConsoleAppender::ConsoleAppender()
  */
 ConsoleAppender::~ConsoleAppender()
 {
-#if ENABLE_LOGGER_LOGGING
+#if LQTL_ENABLE_LOGGER_LOGGING
     std::clog << FUNCTION_NAME << std::endl;
 #endif
 }
@@ -60,7 +62,7 @@ ConsoleAppender::~ConsoleAppender()
  */
 bool ConsoleAppender::writeLog( QString& message )
 {
-#if ENABLE_LOGGER_LOGGING
+#if LQTL_ENABLE_LOGGER_LOGGING
     std::clog << FUNCTION_NAME << std::endl;
 #endif
 

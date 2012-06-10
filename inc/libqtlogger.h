@@ -45,14 +45,18 @@
 #include    <QTextStream>
 #include    <QSettings>
 
+namespace ilardm {
+namespace lib {
+namespace qtlogger {
+
 /** main logger class.
  *
  * Implements sigletone pattern to use C macroses without constructing
  * object on each QtLogger#log call. Actually constructed on first call
  * any of macros defined below. Enqueues log messages and wakes up
  * processor thread which passes enqueued messages to writers
- * (#LogWriterInterface) registered via #ADD_LOG_WRITER macro. Before
- * application exit macro #FINISH_LOGGING must be called to correctly
+ * (#LogWriterInterface) registered via #LQTL_ADD_LOG_WRITER macro. Before
+ * application exit macro #LQTL_FINISH_LOGGING must be called to correctly
  * process all passed log messages.
  *
  * Inherites QThread.
@@ -102,8 +106,8 @@ public:
 
     bool addWriter( LogWriterInterface* );
 
-    QtLogger::LOG_LEVEL setModuleLevel( QString, LOG_LEVEL, bool=false );
-    const QtLogger::MODULE_LEVEL* getModuleLevel( QString );
+    LOG_LEVEL setModuleLevel( QString, LOG_LEVEL, bool=false );
+    const MODULE_LEVEL* getModuleLevel( QString );
     bool setSettingsObject( QSettings* = NULL );
     bool saveModuleLevels();
     bool loadModuleLevels();
@@ -166,23 +170,23 @@ protected:
  *
  * should be called before any logging appeared
  */
-#define ADD_LOG_WRITER( writer )\
-    QtLogger::getInstance().addWriter( writer )
+#define LQTL_ADD_LOG_WRITER( writer )\
+    ilardm::lib::qtlogger::QtLogger::getInstance().addWriter( writer )
 
 /** wrapper for QtLogger#setSettingsObject
  */
-#define SET_SETTINGS_OBJECT( settings )\
-    QtLogger::getInstance().setSettingsObject( settings )
+#define LQTL_SET_SETTINGS_OBJECT( settings )\
+    ilardm::lib::qtlogger::QtLogger::getInstance().setSettingsObject( settings )
 
 /** wrapper for QtLogger#saveModuleLevels.
  */
-#define SAVE_LOG_CONFIG()\
-    QtLogger::getInstance().saveModuleLevels()
+#define LQTL_SAVE_LOG_CONFIG()\
+    ilardm::lib::qtlogger::QtLogger::getInstance().saveModuleLevels()
 
 /** wrapper for QtLogger#loadModuleLevels.
  */
-#define LOAD_LOG_CONFIG()\
-    QtLogger::getInstance().loadModuleLevels()
+#define LQTL_LOAD_LOG_CONFIG()\
+    ilardm::lib::qtlogger::QtLogger::getInstance().loadModuleLevels()
 
 /** loads logger config.
  *
@@ -198,16 +202,16 @@ protected:
  *
  * @param config config file name
  */
-#define START_LOGGING( config )\
-    bool __qtLoggerConfigFileSet = ( QtLogger::getInstance().setSettingsObject( config ) &&\
-                                     QtLogger::getInstance().loadModuleLevels() )
+#define LQTL_START_LOGGING( config )\
+    bool __qtLoggerConfigFileSet = ( ilardm::lib::qtlogger::QtLogger::getInstance().setSettingsObject( config ) &&\
+                                     ilardm::lib::qtlogger::QtLogger::getInstance().loadModuleLevels() )
 
 /** wrapper for QtLogger#finishLogging.
  *
  * must be called before ending application execution
  */
-#define FINISH_LOGGING()\
-    QtLogger::getInstance().finishLogging()
+#define LQTL_FINISH_LOGGING()\
+    ilardm::lib::qtlogger::QtLogger::getInstance().finishLogging()
 
 /** separate filename from given path.
  *
@@ -216,23 +220,23 @@ protected:
  *
  * uses rindex function from strings.h
  */
-#define FILENAME_FROM_PATH( path )\
+#define LQTL_FILENAME_FROM_PATH( path )\
     ( rindex(path,'/')?rindex(path,'/')+1:path )
 
 /** auxiliary macro to suppress compiler warnings.
  */
-#define UNUSED_VARIABLE(var)\
+#define LQTL_UNUSED_VARIABLE(var)\
     ((void)var)
 
 /** auxiliary macro to convert QString to const char*.
   */
-#define QSTRINGCHAR( str )\
+#define LQTL_QSTRINGCHAR( str )\
     str.toLocal8Bit().constData()
 
 /** wrapper for QtLogger#determineModule.
  */
-#define DETERMINE_MODULE()\
-    QtLogger::determineModule(FUNCTION_NAME, __FILE__)
+#define LQTL_DETERMINE_MODULE()\
+    ilardm::lib::qtlogger::QtLogger::determineModule(FUNCTION_NAME, __FILE__)
 
 /** wrapper for QtLogger#setModuleLevel.
  *
@@ -242,8 +246,8 @@ protected:
  * @param name  name for defined variable
  * @param lvl   log level for current module
  */
-#define SET_MODULE_LOGLEVEL( name, lvl )\
-    QtLogger::LOG_LEVEL __loglevelFor##name = QtLogger::getInstance().setModuleLevel( DETERMINE_MODULE, lvl )
+#define LQTL_SET_MODULE_LOGLEVEL( name, lvl )\
+    ilardm::lib::qtlogger::QtLogger::LOG_LEVEL __loglevelFor##name = ilardm::lib::qtlogger::QtLogger::getInstance().setModuleLevel( LQTL_DETERMINE_MODULE, lvl )
 
 /** wrapper for QtLogger#log.
  *
@@ -256,13 +260,13 @@ protected:
  * @param datasz    size of data buffer
  * @param args      arguments for fmt
  */
-#define LOG_WRITE(lvl, fmt, data, datasz, args... )\
-    QtLogger::getInstance().log( lvl,\
-                                 DETERMINE_MODULE(),\
+#define LQTL_LOG_WRITE(lvl, fmt, data, datasz, args... )\
+    ilardm::lib::qtlogger::QtLogger::getInstance().log( lvl,\
+                                 LQTL_DETERMINE_MODULE(),\
                                  QString().sprintf( "%s %s %16s:%-5d\t[%p] %s " fmt,\
                                                     QDateTime::currentDateTime().toString("hh:mm:ss.zzz").toStdString().c_str(),\
-                                                    QtLogger::getInstance().describeLogLevel(lvl).toStdString().c_str(),\
-                                                    FILENAME_FROM_PATH(__FILE__),\
+                                                    ilardm::lib::qtlogger::QtLogger::getInstance().describeLogLevel(lvl).toStdString().c_str(),\
+                                                    LQTL_FILENAME_FROM_PATH(__FILE__),\
                                                     __LINE__,\
                                                     (void*)QThread::currentThreadId(),\
                                                     FUNCTION_NAME ,\
@@ -271,7 +275,7 @@ protected:
                                  data, datasz\
                                )
 
-/** wrapper for #LOG_WRITE
+/** wrapper for #LQTL_LOG_WRITE
  *
  * substitudes lvl with QtLogger#LL_ERROR
  *
@@ -281,7 +285,8 @@ protected:
  * @param args      arguments for fmt
  */
 #define LOG_ERRORX(fmt, data, datasz, args...)\
-    LOG_WRITE( QtLogger::LL_ERROR, fmt, data, datasz , ##args )
+    LQTL_LOG_WRITE( ilardm::lib::qtlogger::QtLogger::LL_ERROR,\
+                    fmt, data, datasz , ##args )
 /** wrapper for #LOG_ERRORX
  *
  * substitudes data with NULL,
@@ -295,7 +300,7 @@ protected:
 #define LOG_ERROR(fmt, args...)\
     LOG_ERRORX( fmt, NULL, 0 , ##args )
 
-/** wrapper for #LOG_WRITE
+/** wrapper for #LQTL_LOG_WRITE
  *
  * substitudes lvl with QtLogger#LL_WARNING
  *
@@ -305,7 +310,8 @@ protected:
  * @param args      arguments for fmt
  */
 #define LOG_WARNX(fmt, data, datasz, args...)\
-    LOG_WRITE( QtLogger::LL_WARNING, fmt, data, datasz , ##args )
+    LQTL_LOG_WRITE( ilardm::lib::qtlogger::QtLogger::LL_WARNING,\
+                    fmt, data, datasz , ##args )
 /** wrapper for #LOG_WARNX
  *
  * substitudes data with NULL,
@@ -319,7 +325,7 @@ protected:
 #define LOG_WARN(fmt, args...)\
     LOG_WARNX( fmt, NULL, 0 , ##args )
 
-/** wrapper for #LOG_WRITE
+/** wrapper for #LQTL_LOG_WRITE
  *
  * substitudes lvl with QtLogger#LL_WARNING_FINE
  *
@@ -329,7 +335,8 @@ protected:
  * @param args      arguments for fmt
  */
 #define LOG_WARNXF(fmt, data, datasz, args...)\
-    LOG_WRITE( QtLogger::LL_WARNING_FINE, fmt, data, datasz , ##args )
+    LQTL_LOG_WRITE( ilardm::lib::qtlogger::QtLogger::LL_WARNING_FINE,\
+                    fmt, data, datasz , ##args )
 /** wrapper for #LOG_WARNXF
  *
  * substitudes data with NULL,
@@ -343,7 +350,7 @@ protected:
 #define LOG_WARNF(fmt, args...)\
     LOG_WARNXF( fmt, NULL, 0 , ##args )
 
-/** wrapper for #LOG_WRITE
+/** wrapper for #LQTL_LOG_WRITE
  *
  * substitudes lvl with QtLogger#LL_LOG
  *
@@ -353,7 +360,8 @@ protected:
  * @param args      arguments for fmt
  */
 #define LOG_LOGX(fmt, data, datasz, args...)\
-    LOG_WRITE( QtLogger::LL_LOG, fmt, data, datasz , ##args )
+    LQTL_LOG_WRITE( ilardm::lib::qtlogger::QtLogger::LL_LOG,\
+                    fmt, data, datasz , ##args )
 /** wrapper for #LOG_LOGX
  *
  * substitudes data with NULL,
@@ -367,7 +375,7 @@ protected:
 #define LOG_LOG(fmt, args...)\
     LOG_LOGX( fmt, NULL, 0 , ##args )
 
-/** wrapper for #LOG_WRITE
+/** wrapper for #LQTL_LOG_WRITE
  *
  * substitudes lvl with QtLogger#LL_LOG_FINE
  *
@@ -377,7 +385,7 @@ protected:
  * @param args      arguments for fmt
  */
 #define LOG_LOGXF(fmt, data, datasz, args...)\
-    LOG_WRITE( fmt, data, datasz , ##args )
+    LQTL_LOG_WRITE( fmt, data, datasz , ##args )
 /** wrapper for #LOG_LOGXF
  *
  * substitudes lvl with QtLogger#LL_LOG_FINE,
@@ -392,7 +400,7 @@ protected:
 #define LOG_LOGF(fmt, args...)\
     LOG_LOGXF( fmt, NULL, 0 , ##args )
 
-/** wrapper for #LOG_WRITE
+/** wrapper for #LQTL_LOG_WRITE
  *
  * substitudes lvl with QtLogger#LL_DEBUG
  *
@@ -402,7 +410,8 @@ protected:
  * @param args      arguments for fmt
  */
 #define LOG_DEBUGX(fmt, data, datasz, args...)\
-    LOG_WRITE( QtLogger::LL_DEBUG, fmt, data, datasz , ##args )
+    LQTL_LOG_WRITE( ilardm::lib::qtlogger::QtLogger::LL_DEBUG,\
+                    fmt, data, datasz , ##args )
 /** wrapper for #LOG_DEBUGX
  *
  * substitudes data with NULL,
@@ -416,7 +425,7 @@ protected:
 #define LOG_DEBUG(fmt, args...)\
     LOG_DEBUGX( fmt, NULL, 0 , ##args )
 
-/** wrapper for #LOG_WRITE
+/** wrapper for #LQTL_LOG_WRITE
  *
  * substitudes lvl with QtLogger#LL_DEBUG_FINE
  *
@@ -426,7 +435,8 @@ protected:
  * @param args      arguments for fmt
  */
 #define LOG_DEBUGXF(fmt, data, datasz, args...)\
-    LOG_WRITE( QtLogger::LL_DEBUG_FINE, fmt, data, datasz , ##args )
+    LQTL_LOG_WRITE( ilardm::lib::qtlogger::QtLogger::LL_DEBUG_FINE,\
+                    fmt, data, datasz , ##args )
 /** wrapper for #LOG_DEBUGXF
  *
  * substitudes data with NULL,
@@ -439,3 +449,7 @@ protected:
  */
 #define LOG_DEBUGF(fmt, args...)\
     LOG_DEBUGXF( fmt, NULL, 0 , ##args )
+
+}   // qtlogger
+}   // lib
+}   // ilardm

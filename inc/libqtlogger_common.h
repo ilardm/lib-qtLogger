@@ -30,6 +30,10 @@
 
 #include <QtCore/qglobal.h>
 
+namespace ilardm {
+namespace lib {
+namespace qtlogger {
+
 #if defined(LIBQTLOGGER_LIBRARY)
 #  define LIBQTLOGGER_EXPORT Q_DECL_EXPORT
 #else
@@ -42,11 +46,11 @@
  *
  * disabled in Release builds
  */
-#define ENABLE_LOGGER_LOGGING   (1)
+#define LQTL_ENABLE_LOGGER_LOGGING   (1)
 
 #if     defined( _RELEASE )
-#undef  ENABLE_LOGGER_LOGGING
-#define ENABLE_LOGGER_LOGGING   (0)     // forced no debug in release
+#undef  LQTL_ENABLE_LOGGER_LOGGING
+#define LQTL_ENABLE_LOGGER_LOGGING   (0)     // forced no debug in release
 #endif
 
 #ifndef __GNUC__
@@ -64,3 +68,7 @@
 #else
 #define FUNCTION_NAME           __PRETTY_FUNCTION__
 #endif
+
+}   // qtlogger
+}   // lib
+}   // ilardm

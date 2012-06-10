@@ -29,6 +29,8 @@
 
 #include    "logwriterinterface.h"
 
+using namespace ilardm::lib::qtlogger;
+
 /** dummy log writer interface constructor.
  */
 LogWriterInterface::LogWriterInterface()

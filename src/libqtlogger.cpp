@@ -34,6 +34,8 @@
 #include    "libqtlogger_common.h"
 #include    "libqtlogger.h"
 
+using namespace ilardm::lib::qtlogger;
+
 /** logger object constructor.
  *
  * initializes internal QtLogger#currentLevel,
@@ -50,7 +52,7 @@ QtLogger::QtLogger()
       settings( NULL ),
       settingsSection( "logging" )
 {
-#if ENABLE_LOGGER_LOGGING
+#if LQTL_ENABLE_LOGGER_LOGGING
     std::clog << FUNCTION_NAME << std::endl;
 #endif
 
@@ -85,7 +87,7 @@ QtLogger::QtLogger()
  */
 QtLogger::~QtLogger()
 {
-#if ENABLE_LOGGER_LOGGING
+#if LQTL_ENABLE_LOGGER_LOGGING
     std::clog << FUNCTION_NAME << std::endl;
 #endif
 }
@@ -110,7 +112,7 @@ QtLogger& QtLogger::getInstance()
  */
 void QtLogger::foo( void* bar )
 {
-#if ENABLE_LOGGER_LOGGING
+#if LQTL_ENABLE_LOGGER_LOGGING
     std::clog << FUNCTION_NAME << std::endl;
 #endif
 }
@@ -140,7 +142,7 @@ void QtLogger::foo( void* bar )
  */
 QString QtLogger::determineModule( const char* funcname, const char* filename )
 {
-#if ENABLE_LOGGER_LOGGING
+#if LQTL_ENABLE_LOGGER_LOGGING
     std::clog << FUNCTION_NAME
             << " funcname: \""
             << ( funcname?funcname:"(null)" ) << "\""
@@ -174,12 +176,12 @@ QString QtLogger::determineModule( const char* funcname, const char* filename )
     {
         // file
 
-        ret = QString( filename ? FILENAME_FROM_PATH( filename ) : defaultModule );
+        ret = QString( filename ? LQTL_FILENAME_FROM_PATH( filename ) : defaultModule );
     }
 
     ret = ret.replace(":", "-").trimmed();
 
-#if ENABLE_LOGGER_LOGGING
+#if LQTL_ENABLE_LOGGER_LOGGING
     std::clog << FUNCTION_NAME
             << " module: \""
             << ret.toStdString() << "\""
@@ -200,7 +202,7 @@ QString QtLogger::determineModule( const char* funcname, const char* filename )
  */
 QString QtLogger::describeLogLevel(QtLogger::LOG_LEVEL level)
 {
-#if ENABLE_LOGGER_LOGGING
+#if LQTL_ENABLE_LOGGER_LOGGING
     std::clog << FUNCTION_NAME
             << " level: "
             << level
@@ -233,7 +235,7 @@ QString QtLogger::describeLogLevel(QtLogger::LOG_LEVEL level)
  */
 void QtLogger::run()
 {
-#if ENABLE_LOGGER_LOGGING
+#if LQTL_ENABLE_LOGGER_LOGGING
     std::clog << FUNCTION_NAME
             << " start"
             << std::endl;
@@ -243,14 +245,14 @@ void QtLogger::run()
 
     while ( !shutdown )
     {
-#if ENABLE_LOGGER_LOGGING
+#if LQTL_ENABLE_LOGGER_LOGGING
         std::clog << FUNCTION_NAME
                 << " waiting"
                 << std::endl;
 #endif
         mqMutex.lock();
         mqWait.wait( &mqMutex );
-#if ENABLE_LOGGER_LOGGING
+#if LQTL_ENABLE_LOGGER_LOGGING
         std::clog << FUNCTION_NAME
                 << " woken"
                 << std::endl;
@@ -259,7 +261,7 @@ void QtLogger::run()
         {
             message = messageQueue.dequeue();
         }
-#if ENABLE_LOGGER_LOGGING
+#if LQTL_ENABLE_LOGGER_LOGGING
         else
         {
             std::clog << FUNCTION_NAME
@@ -271,7 +273,7 @@ void QtLogger::run()
 
         while ( !message.isEmpty() )
         {
-#if ENABLE_LOGGER_LOGGING
+#if LQTL_ENABLE_LOGGER_LOGGING
             std::clog << FUNCTION_NAME
                     << " pass message \""
                     << message.toStdString()
@@ -286,12 +288,12 @@ void QtLogger::run()
                 while ( iter.hasNext() )
                 {
                     LogWriterInterface* writer = iter.next();
-#if ENABLE_LOGGER_LOGGING
+#if LQTL_ENABLE_LOGGER_LOGGING
                     bool status =
 #endif
                     writer->writeLog( message );
 
-#if ENABLE_LOGGER_LOGGING
+#if LQTL_ENABLE_LOGGER_LOGGING
                     std::clog << FUNCTION_NAME
                             << QString().sprintf( " writer @ %p returned %c",
                                                   writer,
@@ -316,7 +318,7 @@ void QtLogger::run()
         }
     }
 
-#if ENABLE_LOGGER_LOGGING
+#if LQTL_ENABLE_LOGGER_LOGGING
     std::clog << FUNCTION_NAME
             << " end"
             << std::endl;
@@ -338,7 +340,7 @@ void QtLogger::run()
  */
 QString QtLogger::hexData( const void* data, const size_t datasz )
 {
-#if ENABLE_LOGGER_LOGGING
+#if LQTL_ENABLE_LOGGER_LOGGING
     std::clog << FUNCTION_NAME
             << " data @"
             << QString().sprintf( " %p", data ).toStdString()
@@ -389,7 +391,7 @@ QString QtLogger::hexData( const void* data, const size_t datasz )
  */
 bool QtLogger::addWriter( LogWriterInterface* writer )
 {
-#if ENABLE_LOGGER_LOGGING
+#if LQTL_ENABLE_LOGGER_LOGGING
     std::clog << FUNCTION_NAME
             << " writer: "
             << (writer?(QString().sprintf( "%p", writer ).toStdString()):"(null)")
@@ -398,7 +400,7 @@ bool QtLogger::addWriter( LogWriterInterface* writer )
 
     if ( !writer )
     {
-#if ENABLE_LOGGER_LOGGING
+#if LQTL_ENABLE_LOGGER_LOGGING
         std::cerr << FUNCTION_NAME
                 << " NULL writer"
                 << std::endl;
@@ -409,7 +411,7 @@ bool QtLogger::addWriter( LogWriterInterface* writer )
    wlMutex.lock();
    writersList.append( writer );
 
-#if ENABLE_LOGGER_LOGGING
+#if LQTL_ENABLE_LOGGER_LOGGING
     std::clog << FUNCTION_NAME
             << " wl.size: "
             << writersList.size()
@@ -434,7 +436,7 @@ bool QtLogger::addWriter( LogWriterInterface* writer )
  */
 QtLogger::LOG_LEVEL QtLogger::setModuleLevel( QString module, LOG_LEVEL lvl, bool final )
 {
-#if ENABLE_LOGGER_LOGGING
+#if LQTL_ENABLE_LOGGER_LOGGING
     std::clog << FUNCTION_NAME
             << " module: "
             << module.toStdString()
@@ -450,7 +452,7 @@ QtLogger::LOG_LEVEL QtLogger::setModuleLevel( QString module, LOG_LEVEL lvl, boo
     ) {
         lvl = currentLevel;
 
-#if ENABLE_LOGGER_LOGGING
+#if LQTL_ENABLE_LOGGER_LOGGING
         std::clog << FUNCTION_NAME
                 << " incorrect log level passed. set to default"
                 << std::endl;
@@ -470,7 +472,7 @@ QtLogger::LOG_LEVEL QtLogger::setModuleLevel( QString module, LOG_LEVEL lvl, boo
         // reset if !final
         if ( mlvl->final )
         {
-#if ENABLE_LOGGER_LOGGING
+#if LQTL_ENABLE_LOGGER_LOGGING
             std::clog << FUNCTION_NAME
                     << " log level for this module already final. rejected"
                     << std::endl;
@@ -479,7 +481,7 @@ QtLogger::LOG_LEVEL QtLogger::setModuleLevel( QString module, LOG_LEVEL lvl, boo
         }
         else
         {
-#if ENABLE_LOGGER_LOGGING
+#if LQTL_ENABLE_LOGGER_LOGGING
             std::clog << FUNCTION_NAME
                     << " replace existsing log level"
                     << std::endl;
@@ -491,7 +493,7 @@ QtLogger::LOG_LEVEL QtLogger::setModuleLevel( QString module, LOG_LEVEL lvl, boo
 
     if ( insert )
     {
-#if ENABLE_LOGGER_LOGGING
+#if LQTL_ENABLE_LOGGER_LOGGING
         std::clog << FUNCTION_NAME
                 << " insert new loglevel for module"
                 << std::endl;
@@ -502,7 +504,7 @@ QtLogger::LOG_LEVEL QtLogger::setModuleLevel( QString module, LOG_LEVEL lvl, boo
 
         if ( !nmlvl )
         {
-#if ENABLE_LOGGER_LOGGING
+#if LQTL_ENABLE_LOGGER_LOGGING
             std::cerr << FUNCTION_NAME
                     << " unable to create loglevel for module"
                     << std::endl;
@@ -529,7 +531,7 @@ QtLogger::LOG_LEVEL QtLogger::setModuleLevel( QString module, LOG_LEVEL lvl, boo
  */
 const QtLogger::MODULE_LEVEL* QtLogger::getModuleLevel( QString module )
 {
-#if ENABLE_LOGGER_LOGGING
+#if LQTL_ENABLE_LOGGER_LOGGING
     std::clog << FUNCTION_NAME
             << " module: "
             << module.toStdString()
@@ -557,7 +559,7 @@ const QtLogger::MODULE_LEVEL* QtLogger::getModuleLevel( QString module )
  */
 bool QtLogger::setSettingsObject( QSettings* settings )
 {
-#if ENABLE_LOGGER_LOGGING
+#if LQTL_ENABLE_LOGGER_LOGGING
     std::clog << FUNCTION_NAME
             << " settings file \""
             << ( settings?settings->fileName().toStdString().c_str():"(null)" ) << "\""
@@ -583,13 +585,13 @@ bool QtLogger::setSettingsObject( QSettings* settings )
  */
 bool QtLogger::saveModuleLevels()
 {
-#if ENABLE_LOGGER_LOGGING
+#if LQTL_ENABLE_LOGGER_LOGGING
     std::clog << FUNCTION_NAME << std::endl;
 #endif
 
     if ( settings )
     {
-#if ENABLE_LOGGER_LOGGING
+#if LQTL_ENABLE_LOGGER_LOGGING
         std::clog << FUNCTION_NAME
                 << " using settings object"
                 << std::endl;
@@ -603,7 +605,7 @@ bool QtLogger::saveModuleLevels()
         {
             iter.next();
 
-#if ENABLE_LOGGER_LOGGING
+#if LQTL_ENABLE_LOGGER_LOGGING
             std::clog << FUNCTION_NAME
                     << " module: \""
                     << iter.key().toStdString() << "\""
@@ -621,7 +623,7 @@ bool QtLogger::saveModuleLevels()
         return true;
     }
 
-#if ENABLE_LOGGER_LOGGING
+#if LQTL_ENABLE_LOGGER_LOGGING
         std::clog << FUNCTION_NAME
                 << " no settings object. log levels would not be saved"
                 << std::endl;
@@ -640,13 +642,13 @@ bool QtLogger::saveModuleLevels()
  */
 bool QtLogger::loadModuleLevels()
 {
-#if ENABLE_LOGGER_LOGGING
+#if LQTL_ENABLE_LOGGER_LOGGING
     std::clog << FUNCTION_NAME << std::endl;
 #endif
 
     if ( settings )
     {
-#if ENABLE_LOGGER_LOGGING
+#if LQTL_ENABLE_LOGGER_LOGGING
         std::clog << FUNCTION_NAME
                 << " using settings object"
                 << std::endl;
@@ -666,10 +668,10 @@ bool QtLogger::loadModuleLevels()
             {
                 currentLevel = (LOG_LEVEL)settings->value( key, currentLevel ).toInt();
 
-#if ENABLE_LOGGER_LOGGING
+#if LQTL_ENABLE_LOGGER_LOGGING
                 std::clog << FUNCTION_NAME
                         << " restored default log level: "
-                        << QSTRINGCHAR( describeLogLevel( currentLevel ) )
+                        << LQTL_QSTRINGCHAR( describeLogLevel( currentLevel ) )
                         << std::endl;
 #endif
             }
@@ -682,7 +684,7 @@ bool QtLogger::loadModuleLevels()
         return true;
     }
 
-#if ENABLE_LOGGER_LOGGING
+#if LQTL_ENABLE_LOGGER_LOGGING
         std::clog << FUNCTION_NAME
                 << " no settings object. log levels would not be loaded"
                 << std::endl;
@@ -711,7 +713,7 @@ bool QtLogger::loadModuleLevels()
  */
 void QtLogger::log(LOG_LEVEL level, QString module, QString message, void* data, size_t datasz)
 {
-#if ENABLE_LOGGER_LOGGING
+#if LQTL_ENABLE_LOGGER_LOGGING
     std::clog << FUNCTION_NAME
             << " lvl: " << ll_string[ (level>=LL_STUB || level<0)?LL_STUB:level ].toStdString()
             << " module: \"" << module.toStdString() << "\""
@@ -722,7 +724,7 @@ void QtLogger::log(LOG_LEVEL level, QString module, QString message, void* data,
     if ( level >= LL_STUB ||
          level < 0
     ) {
-#if ENABLE_LOGGER_LOGGING
+#if LQTL_ENABLE_LOGGER_LOGGING
         std::cerr << FUNCTION_NAME
                 << "incorrect log level"
                 << std::endl;
@@ -736,7 +738,7 @@ void QtLogger::log(LOG_LEVEL level, QString module, QString message, void* data,
     if ( mlvl
          && level > mlvl->level
     ) {
-#if ENABLE_LOGGER_LOGGING
+#if LQTL_ENABLE_LOGGER_LOGGING
         std::clog << FUNCTION_NAME
                 << " log message rejected: moduleLevel: "
                 << ll_string[ mlvl->level ].toStdString()
@@ -758,7 +760,7 @@ void QtLogger::log(LOG_LEVEL level, QString module, QString message, void* data,
     if ( checkCurrentLogLevel
          && level > currentLevel )
     {
-#if ENABLE_LOGGER_LOGGING
+#if LQTL_ENABLE_LOGGER_LOGGING
         std::clog << FUNCTION_NAME
                 << " log message rejected: currentLevel: "
                 << ll_string[ currentLevel ].toStdString()
@@ -776,7 +778,7 @@ void QtLogger::log(LOG_LEVEL level, QString module, QString message, void* data,
     mqMutex.lock();
     messageQueue.enqueue( message );
 
-#if ENABLE_LOGGER_LOGGING
+#if LQTL_ENABLE_LOGGER_LOGGING
     std::clog << FUNCTION_NAME
             << " message queue size: "
             << messageQueue.size()
@@ -801,12 +803,12 @@ void QtLogger::log(LOG_LEVEL level, QString module, QString message, void* data,
  */
 void QtLogger::finishLogging()
 {
-#if ENABLE_LOGGER_LOGGING
+#if LQTL_ENABLE_LOGGER_LOGGING
     std::clog << FUNCTION_NAME << std::endl;
 #endif
 
     mqMutex.lock();
-#if ENABLE_LOGGER_LOGGING
+#if LQTL_ENABLE_LOGGER_LOGGING
     std::clog << FUNCTION_NAME
             << " messageQueue size: "
             << messageQueue.size()
@@ -817,14 +819,14 @@ void QtLogger::finishLogging()
     mqWait.wakeAll();
     mqMutex.unlock();
 
-#if ENABLE_LOGGER_LOGGING
+#if LQTL_ENABLE_LOGGER_LOGGING
     std::clog << FUNCTION_NAME
             << " wait thread to end"
             << std::endl;
 #endif
     this->wait();
 
-#if ENABLE_LOGGER_LOGGING
+#if LQTL_ENABLE_LOGGER_LOGGING
     std::clog << FUNCTION_NAME
             << " cleanup writers list"
             << std::endl;
@@ -835,14 +837,14 @@ void QtLogger::finishLogging()
         writersList.pop_front();
     }
 
-#if ENABLE_LOGGER_LOGGING
+#if LQTL_ENABLE_LOGGER_LOGGING
     std::clog << FUNCTION_NAME
             << " saving logger config"
             << std::endl;
 #endif
     saveModuleLevels();
 
-#if ENABLE_LOGGER_LOGGING
+#if LQTL_ENABLE_LOGGER_LOGGING
     std::clog << FUNCTION_NAME
             << " cleanup moduleMap"
             << std::endl;
@@ -853,7 +855,7 @@ void QtLogger::finishLogging()
         delete( iter.next().value() );
     }
 
-#if ENABLE_LOGGER_LOGGING
+#if LQTL_ENABLE_LOGGER_LOGGING
     std::clog << FUNCTION_NAME
             << " done"
             << std::endl;

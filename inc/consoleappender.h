@@ -31,6 +31,10 @@
 
 #include    <QString>
 
+namespace ilardm {
+namespace lib {
+namespace qtlogger {
+
 /** console log writer class.
  *
  * appends log messages to the console
@@ -47,3 +51,7 @@ public:
 public:
     virtual bool writeLog( QString& );
 };
+
+}   // qtlogger
+}   // lib
+}   // ilardm

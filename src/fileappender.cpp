@@ -31,6 +31,8 @@
 #include    "libqtlogger_common.h"
 #include    "fileappender.h"
 
+using namespace ilardm::lib::qtlogger;
+
 /** log file and stream constructor.
  *
  * constructs file handle,
@@ -44,7 +46,7 @@ FileAppender::FileAppender( QString filename )
       lfStream( &logfile ),
       valid( false )
 {
-#if ENABLE_LOGGER_LOGGING
+#if LQTL_ENABLE_LOGGER_LOGGING
     std::clog << FUNCTION_NAME
             << " filename: "
             << filename.toStdString()
@@ -61,7 +63,7 @@ FileAppender::FileAppender( QString filename )
         {
             valid = true;
         }
-#if ENABLE_LOGGER_LOGGING
+#if LQTL_ENABLE_LOGGER_LOGGING
         else
         {
             std::cerr << FUNCTION_NAME
@@ -71,7 +73,7 @@ FileAppender::FileAppender( QString filename )
         }
 #endif
     }
-#if ENABLE_LOGGER_LOGGING
+#if LQTL_ENABLE_LOGGER_LOGGING
     else
     {
         std::cerr << FUNCTION_NAME
@@ -90,13 +92,13 @@ FileAppender::FileAppender( QString filename )
  */
 FileAppender::~FileAppender()
 {
-#if ENABLE_LOGGER_LOGGING
+#if LQTL_ENABLE_LOGGER_LOGGING
     std::clog << FUNCTION_NAME << std::endl;
 #endif
 
     if ( valid )
     {
-#if ENABLE_LOGGER_LOGGING
+#if LQTL_ENABLE_LOGGER_LOGGING
         std::clog << FUNCTION_NAME
                 << " append log file with new line"
                 << std::endl;
@@ -104,7 +106,7 @@ FileAppender::~FileAppender()
         lfStream << "\n";
         lfStream.flush();
 
-#if ENABLE_LOGGER_LOGGING
+#if LQTL_ENABLE_LOGGER_LOGGING
         std::clog << FUNCTION_NAME
                 << " close log file"
                 << std::endl;
@@ -125,7 +127,7 @@ FileAppender::~FileAppender()
  */
 bool FileAppender::writeLog( QString& message )
 {
-#if ENABLE_LOGGER_LOGGING
+#if LQTL_ENABLE_LOGGER_LOGGING
     std::clog << FUNCTION_NAME << std::endl;
 #endif
 

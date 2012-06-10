@@ -33,6 +33,10 @@
 #include    <QFile>
 #include    <QTextStream>
 
+namespace ilardm {
+namespace lib {
+namespace qtlogger {
+
 /** log file appender class.
  *
  * creates (if file not exists before) and appends
@@ -61,3 +65,7 @@ protected:
      */
     bool valid;
 };
+
+}   // qtlogger
+}   // lib
+}   // ilardm

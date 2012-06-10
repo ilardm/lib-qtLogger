@@ -32,6 +32,10 @@
 
 #include    <QString>
 
+namespace ilardm {
+namespace lib {
+namespace qtlogger {
+
 /** log writer interface.
  *
  * defines common interface for particular
@@ -57,3 +61,7 @@ public:
      */
     virtual bool writeLog( QString& ) = 0;
 };
+
+}   // qtlogger
+}   // lib
+}   // ilardm
