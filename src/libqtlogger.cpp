@@ -714,6 +714,48 @@ bool QtLogger::loadModuleLevels()
     std::clog << FUNCTION_NAME << std::endl;
 #endif
 
+    if ( settings )
+    {
+#if ENABLE_LOGGER_LOGGING
+        std::clog << FUNCTION_NAME
+                << " using settings object"
+                << std::endl;
+#endif
+        settings->beginGroup( settingsSection );
+        currentLevel = (LOG_LEVEL)settings->value( defaultModuleLevel, currentLevel ).toInt();
+#if ENABLE_LOGGER_LOGGING
+        std::clog << FUNCTION_NAME
+                << " restored default log level: "
+                << QSTRINGCHAR( describeLogLevel( currentLevel ) )
+                << std::endl;
+#endif
+
+        QStringList keys = settings->allKeys();
+        mmMutex.lock();
+
+        foreach ( const QString &key, keys )
+        {
+            setModuleLevel( key,
+                            (LOG_LEVEL)(settings->value( key, currentLevel ).toInt()),
+                            true
+                          );
+        }
+
+        mmMutex.unlock();
+        settings->endGroup();
+        settings->sync();
+
+        return true;
+    }
+    else
+    {
+#if ENABLE_LOGGER_LOGGING
+        std::clog << FUNCTION_NAME
+                << " using old-behaviour"
+                << std::endl;
+#endif
+    }
+
     if ( configFileName.isEmpty() )
     {
         return false;
