@@ -104,7 +104,6 @@ public:
 
     QtLogger::LOG_LEVEL setModuleLevel( QString, LOG_LEVEL, bool=false );
     const QtLogger::MODULE_LEVEL* getModuleLevel( QString );
-    bool setConfigFileName( const char* );
     bool setSettingsObject( QSettings* = NULL );
     bool saveModuleLevels();
     bool loadModuleLevels();
@@ -155,16 +154,6 @@ protected:
      */
     QMutex mmMutex;
 
-    /** logger config file name.
-     */
-    QString configFileName;
-    /** logger config file object.
-     */
-    QFile configFile;
-    /** logger config file text stream.
-     */
-    QTextStream configStream;
-
     QSettings* settings;
     QString settingsSection;
 };
@@ -181,12 +170,12 @@ protected:
 
 /** wrapper for QtLogger#saveModuleLevels.
  */
-#define SAVE_LOG_CONFIG\
+#define SAVE_LOG_CONFIG()\
     QtLogger::getInstance().saveModuleLevels()
 
 /** wrapper for QtLogger#loadModuleLevels.
  */
-#define LOAD_LOG_CONFIG\
+#define LOAD_LOG_CONFIG()\
     QtLogger::getInstance().loadModuleLevels()
 
 /** loads logger config.
@@ -204,7 +193,7 @@ protected:
  * @param config config file name
  */
 #define START_LOGGING( config )\
-    bool __qtLoggerConfigFileSet = ( QtLogger::getInstance().setConfigFileName( config ) &&\
+    bool __qtLoggerConfigFileSet = ( QtLogger::getInstance().setSettingsObject( config ) &&\
                                      QtLogger::getInstance().loadModuleLevels() )
 
 /** wrapper for QtLogger#finishLogging.
@@ -236,7 +225,7 @@ protected:
 
 /** wrapper for QtLogger#determineModule.
  */
-#define DETERMINE_MODULE\
+#define DETERMINE_MODULE()\
     QtLogger::determineModule(FUNCTION_NAME, __FILE__)
 
 /** wrapper for QtLogger#setModuleLevel.
@@ -263,7 +252,7 @@ protected:
  */
 #define LOG_WRITE(lvl, fmt, data, datasz, args... )\
     QtLogger::getInstance().log( lvl,\
-                                 DETERMINE_MODULE,\
+                                 DETERMINE_MODULE(),\
                                  QString().sprintf( "%s %s %16s:%d\t[%p] %s " fmt,\
                                                     QDateTime::currentDateTime().toString("hh:mm:ss.zzz").toStdString().c_str(),\
                                                     QtLogger::getInstance().describeLogLevel(lvl).toStdString().c_str(),\

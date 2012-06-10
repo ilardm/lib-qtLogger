@@ -46,9 +46,6 @@ QtLogger::QtLogger()
     : defaultModuleLevel( "-default" ),
       currentLevel( LL_WARNING ),
       mmMutex(QMutex::Recursive),    // allow loadModuleLevels to lock
-      configFileName(""),
-      configFile( configFileName ),
-      configStream( &configFile ),
       settings( NULL ),
       settingsSection( "logging" )
 {
@@ -541,38 +538,12 @@ const QtLogger::MODULE_LEVEL* QtLogger::getModuleLevel( QString module )
     return ret;
 }
 
-/** set logger config file name.
- *
- * @param filename config file name
- *
- * @return true if not NULL filename<br>
- *         false otherwise.
- */
-bool QtLogger::setConfigFileName( const char* filename )
-{
-#if ENABLE_LOGGER_LOGGING
-    std::clog << FUNCTION_NAME
-            << " filename: \""
-            << ( filename?filename:"(null)" ) << "\""
-            << std::endl;
-#endif
-
-    if ( filename )
-    {
-        configFileName = QString( filename );
-
-        return true;
-    }
-
-    return false;
-}
-
 bool QtLogger::setSettingsObject( QSettings* settings )
 {
 #if ENABLE_LOGGER_LOGGING
     std::clog << FUNCTION_NAME
             << " settings file \""
-            << ( settings?settings->fileName().toStdString().c_str():"(null)" )
+            << ( settings?settings->fileName().toStdString().c_str():"(null)" ) << "\""
             << std::endl;
 #endif
 
@@ -628,7 +599,6 @@ bool QtLogger::saveModuleLevels()
                     << std::endl;
 #endif
 
-//            configStream << line.arg( iter.key() ).arg( (int)(iter.value()->level) );
             settings->setValue( iter.key(), (int)(iter.value()->level) );
         }
         mmMutex.unlock();
@@ -637,67 +607,14 @@ bool QtLogger::saveModuleLevels()
 
         return true;
     }
-    else
-    {
-#if ENABLE_LOGGER_LOGGING
-        std::clog << FUNCTION_NAME
-                << " using old-behaviour"
-                << std::endl;
-#endif
-    }
-
-    if ( configFileName.isEmpty() )
-    {
-        return false;
-    }
-
-    bool status = false;
-
-    configFile.setFileName( configFileName );
-    status = configFile.open( QIODevice::WriteOnly
-                     | QIODevice::Text );
-
-    if ( status )
-    {
-        status = ( configStream.status() == QTextStream::Ok );
-    }
-
-    if ( !status )
-    {
-#if ENABLE_LOGGER_LOGGING
-        std::cerr << FUNCTION_NAME
-                << " unable to open config file"
-                << std::endl;
-#endif
-        return false;
-    }
-
-    QString line("%1\t%2\n");
-
-    // save default log level
-    configStream << line.arg( defaultModuleLevel ).arg( (int)(currentLevel) );
-
-    mmMutex.lock();
-    QMapIterator< QString, MODULE_LEVEL* > iter( moduleMap );
-    while ( iter.hasNext() )
-    {
-        iter.next();
 
 #if ENABLE_LOGGER_LOGGING
         std::clog << FUNCTION_NAME
-                << " module: \""
-                << iter.key().toStdString() << "\""
-                << " level: "
-                << (int)(iter.value()->level)
+                << " no settings object. log levels would not be saved"
                 << std::endl;
 #endif
 
-        configStream << line.arg( iter.key() ).arg( (int)(iter.value()->level) );
-    }
-    mmMutex.unlock();
-    configFile.close();
-
-    return true;
+    return false;
 }
 
 /** loads log levels for modules from config.
@@ -722,14 +639,6 @@ bool QtLogger::loadModuleLevels()
                 << std::endl;
 #endif
         settings->beginGroup( settingsSection );
-        currentLevel = (LOG_LEVEL)settings->value( defaultModuleLevel, currentLevel ).toInt();
-#if ENABLE_LOGGER_LOGGING
-        std::clog << FUNCTION_NAME
-                << " restored default log level: "
-                << QSTRINGCHAR( describeLogLevel( currentLevel ) )
-                << std::endl;
-#endif
-
         QStringList keys = settings->allKeys();
         mmMutex.lock();
 
@@ -739,6 +648,18 @@ bool QtLogger::loadModuleLevels()
                             (LOG_LEVEL)(settings->value( key, currentLevel ).toInt()),
                             true
                           );
+
+            if ( key == defaultModuleLevel )
+            {
+                currentLevel = (LOG_LEVEL)settings->value( key, currentLevel ).toInt();
+
+#if ENABLE_LOGGER_LOGGING
+                std::clog << FUNCTION_NAME
+                        << " restored default log level: "
+                        << QSTRINGCHAR( describeLogLevel( currentLevel ) )
+                        << std::endl;
+#endif
+            }
         }
 
         mmMutex.unlock();
@@ -747,82 +668,13 @@ bool QtLogger::loadModuleLevels()
 
         return true;
     }
-    else
-    {
+
 #if ENABLE_LOGGER_LOGGING
         std::clog << FUNCTION_NAME
-                << " using old-behaviour"
+                << " no settings object. log levels would not be loaded"
                 << std::endl;
 #endif
-    }
-
-    if ( configFileName.isEmpty() )
-    {
-        return false;
-    }
-
-    bool status = false;
-
-    configFile.setFileName( configFileName );
-    status = configFile.open( QIODevice::ReadOnly
-                     | QIODevice::Text );
-
-    if ( status )
-    {
-        status = ( configStream.status() == QTextStream::Ok );
-    }
-
-    if ( !status )
-    {
-#if ENABLE_LOGGER_LOGGING
-        std::cerr << FUNCTION_NAME
-                << " unable to open config file"
-                << std::endl;
-#endif
-        return false;
-    }
-
-    QString line("");
-    QStringList linesplit;
-
-    mmMutex.lock();
-    while ( !(line = configStream.readLine()).isNull() )
-    {
-        linesplit = line.split("\t");
-
-        if ( linesplit.length() < 2 )
-        {
-#if ENABLE_LOGGER_LOGGING
-            std::clog << FUNCTION_NAME
-                    << " incorrect line from config"
-                    << std::endl;
-#endif
-            continue;
-        }
-
-        // check for default log level
-        if ( linesplit.at(0) == defaultModuleLevel )
-        {
-            currentLevel = (LOG_LEVEL)(linesplit.at(1).toInt());
-
-#if ENABLE_LOGGER_LOGGING
-            std::clog << FUNCTION_NAME
-                    << " current level: "
-                    <<  currentLevel
-                    << std::endl;
-#endif
-        }
-        else
-        {
-            // or add module log level value
-            setModuleLevel( linesplit.at(0), (LOG_LEVEL)(linesplit.at(1).toInt()), true );
-        }
-    }
-    mmMutex.unlock();
-
-    configFile.close();
-
-    return true;
+    return false;
 }
 
 /** log passed message.
