@@ -43,7 +43,8 @@
  * launches logger thread QtLogger#run
  */
 QtLogger::QtLogger()
-    : currentLevel( LL_WARNING ),
+    : defaultModuleLevel( "-default" ),
+      currentLevel( LL_WARNING ),
       mmMutex(QMutex::Recursive),    // allow loadModuleLevels to lock
       configFileName(""),
       configFile( configFileName ),
@@ -64,8 +65,6 @@ QtLogger::QtLogger()
     ll_string[ LL_DEBUG_FINE    ].sprintf( "debug+" );
 
     ll_string[ LL_STUB          ].sprintf( "      " );
-
-    defaultModuleLevel.sprintf( "::default" );
 
     messageQueue.enqueue(
             QString("logger startup: %1").arg(
@@ -147,7 +146,7 @@ QString QtLogger::determineModule( const char* funcname, const char* filename )
 #endif
 
     // TODO: optimize
-    static char defaultModule[] = "default";
+    static const char* defaultModule = (const char*)(QtLogger::getInstance().defaultModuleLevel.toStdString().c_str());
 
     QString ret( funcname ? funcname : defaultModule );
     if ( ret.contains("(") )
@@ -174,7 +173,7 @@ QString QtLogger::determineModule( const char* funcname, const char* filename )
         ret = QString( filename ? FILENAME_FROM_PATH( filename ) : defaultModule );
     }
 
-    ret = ret.trimmed();
+    ret = ret.replace(":", "-").trimmed();
 
 #if ENABLE_LOGGER_LOGGING
     std::clog << FUNCTION_NAME
