@@ -253,7 +253,7 @@ protected:
 #define LOG_WRITE(lvl, fmt, data, datasz, args... )\
     QtLogger::getInstance().log( lvl,\
                                  DETERMINE_MODULE(),\
-                                 QString().sprintf( "%s %s %16s:%d\t[%p] %s " fmt,\
+                                 QString().sprintf( "%s %s %16s:%-5d\t[%p] %s " fmt,\
                                                     QDateTime::currentDateTime().toString("hh:mm:ss.zzz").toStdString().c_str(),\
                                                     QtLogger::getInstance().describeLogLevel(lvl).toStdString().c_str(),\
                                                     FILENAME_FROM_PATH(__FILE__),\

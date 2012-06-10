@@ -64,9 +64,15 @@ QtLogger::QtLogger()
     ll_string[ LL_STUB          ].sprintf( "      " );
 
     messageQueue.enqueue(
+            QString("=======================================")
+            );
+    messageQueue.enqueue(
             QString("logger startup: %1").arg(
                 QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss.zzz")
                 )
+            );
+    messageQueue.enqueue(
+            QString("=======================================")
             );
 
     this->start();
