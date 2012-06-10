@@ -38,7 +38,8 @@
  *
  * initializes internal QtLogger#currentLevel,
  * initializes #ll_string array with string represenattion of #LOG_LEVEL,
- * initializes QtLogger#defaultModuleLevel with "::default",
+ * initializes QtLogger#defaultModuleLevel with "-default",
+ * initializes QtLogger#settingsSection with "logging",
  * enqueues startup log message with current date and time,
  * launches logger thread QtLogger#run
  */
@@ -130,7 +131,7 @@ void QtLogger::foo( void* bar )
  * module name = "fooNameSpace".
  *
  * if called from fooNameSpace::FooClass::fooMethod() --
- * module name = "fooNameSpace::FooClass".
+ * module name = "fooNameSpace--FooClass".
  *
  * @param funcname  should be #FUNCTION_NAME
  * @param filename  should be __FILE__
@@ -544,6 +545,16 @@ const QtLogger::MODULE_LEVEL* QtLogger::getModuleLevel( QString module )
     return ret;
 }
 
+/** set main-application settings object.
+ *
+ * should be set before QtLogger#saveModuleLevels
+ * or Qtlogger#loadModuleLevels invoked
+ *
+ * @param settings main-application settings object
+ *
+ * @return true if settings object not NULL<br>
+ *         false otherwise
+ */
 bool QtLogger::setSettingsObject( QSettings* settings )
 {
 #if ENABLE_LOGGER_LOGGING
@@ -562,11 +573,7 @@ bool QtLogger::setSettingsObject( QSettings* settings )
     return false;
 }
 
-/** saves log levels for modles.
- *
- * opens logger config file for write-only,
- * so any changes since last QtLogger#loadModuleLevels
- * will be lost.
+/** saves log levels for modules.
  *
  * saves also default log level with module name
  * as set in QtLogger#defaultModuleLevel.

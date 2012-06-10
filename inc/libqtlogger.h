@@ -154,7 +154,11 @@ protected:
      */
     QMutex mmMutex;
 
+    /** main application settings object where logger settings would be stored
+     */
     QSettings* settings;
+    /** logger settings section
+     */
     QString settingsSection;
 };
 
@@ -165,6 +169,8 @@ protected:
 #define ADD_LOG_WRITER( writer )\
     QtLogger::getInstance().addWriter( writer )
 
+/** wrapper for QtLogger#setSettingsObject
+ */
 #define SET_SETTINGS_OBJECT( settings )\
     QtLogger::getInstance().setSettingsObject( settings )
 
@@ -180,14 +186,14 @@ protected:
 
 /** loads logger config.
  *
- * should be called first (even before #main )
+ * should be called first (right after QSettings object created)
  * to load all log levels for modules.
  *
  * defines boolean __qtLoggerConfigFileSet set to
- * true if filename was set && config file was load
- * ( by calling QtLogger#setConfigFileName combining
+ * true if settings object was set && settings was loaded
+ * ( by calling QtLogger#setSettingsObject combining
  * with QtLogger#loadModuleLevels by '&&', so no
- * config loading if QtLogger#setConfigFileName
+ * settings loading if QtLogger#setSettingsObject
  * returned false ).
  *
  * @param config config file name
