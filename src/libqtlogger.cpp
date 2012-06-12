@@ -42,7 +42,6 @@ using namespace ilardm::lib::qtlogger;
  * initializes #ll_string array with string represenattion of #LOG_LEVEL,
  * initializes QtLogger#defaultModuleLevel with "-default",
  * initializes QtLogger#settingsSection with "logging",
- * enqueues startup log message with current date and time,
  * launches logger thread QtLogger#run
  */
 QtLogger::QtLogger()
@@ -65,18 +64,6 @@ QtLogger::QtLogger()
     ll_string[ LL_DEBUG_FINE    ].sprintf( "debug+" );
 
     ll_string[ LL_STUB          ].sprintf( "      " );
-
-    messageQueue.enqueue(
-            QString("=======================================")
-            );
-    messageQueue.enqueue(
-            QString("logger startup: %1").arg(
-                QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss.zzz")
-                )
-            );
-    messageQueue.enqueue(
-            QString("=======================================")
-            );
 
     this->start();
 }

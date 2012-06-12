@@ -28,6 +28,8 @@
 
 #include    <iostream>
 
+#include    <QDateTime>
+
 #include    "libqtlogger_common.h"
 #include    "fileappender.h"
 
@@ -63,25 +65,33 @@ FileAppender::FileAppender( QString filename )
         {
             valid = true;
         }
-#if LQTL_ENABLE_LOGGER_LOGGING
         else
         {
+#if LQTL_ENABLE_LOGGER_LOGGING
             std::cerr << FUNCTION_NAME
                     << " unable to create text stream: "
                     << lfStream.status()
                     << std::endl;
-        }
 #endif
+            return;
+        }
     }
-#if LQTL_ENABLE_LOGGER_LOGGING
     else
     {
+#if LQTL_ENABLE_LOGGER_LOGGING
         std::cerr << FUNCTION_NAME
                 << " unable to open file: "
                 << logfile.error()
                 << std::endl;
-    }
 #endif
+        return;
+    }
+
+    lfStream << QString("=======================================\n");
+    lfStream << QString("logger startup: %1\n").arg(
+                    QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss.zzz")
+                );
+    lfStream << QString("=======================================\n");
 }
 
 /** stream destructor.
