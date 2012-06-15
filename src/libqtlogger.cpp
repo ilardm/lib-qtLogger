@@ -337,6 +337,7 @@ QString QtLogger::hexData( const void* data, const size_t datasz )
 #endif
 
     QString result("\n");
+    QString asciidata("");
     quint8* p = (quint8*)data;
 
     for ( size_t i = 0; i < datasz; i++ )
@@ -354,11 +355,19 @@ QString QtLogger::hexData( const void* data, const size_t datasz )
         {
             result.append( QString().sprintf( "%02x ", p[i] ) );
         }
+        // append with char (if printable) or with '.' symbol
+        asciidata.append( (const char)( (p[i] >= 0x20 && p[i] <= 0x7e) ? p[i] : 0xe2 ) );
 
         if ( (i+1) % 16 == 0)
         {
-            result.replace( result.length()-1, 1, "\n" );
+            result.replace( result.length()-1, 1, QString("\t'%1'\n").arg( asciidata ) );
+            asciidata.clear();
         }
+    }
+
+    if ( !asciidata.isEmpty() )
+    {
+        result.append( QString("\t'%1'").arg( asciidata ) );
     }
 
     return result;
