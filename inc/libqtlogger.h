@@ -112,7 +112,7 @@ public:
     bool saveModuleLevels();
     bool loadModuleLevels();
 
-    void log( LOG_LEVEL, QString, QString, void*, size_t );
+    void log( LOG_LEVEL, QString, QString, const void*, size_t );
 
     void finishLogging();
 
@@ -385,7 +385,8 @@ protected:
  * @param args      arguments for fmt
  */
 #define LOG_LOGXF(fmt, data, datasz, args...)\
-    LQTL_LOG_WRITE( fmt, data, datasz , ##args )
+    LQTL_LOG_WRITE( ilardm::lib::qtlogger::QtLogger::LL_LOG_FINE,\
+                    fmt, data, datasz , ##args )
 /** wrapper for #LOG_LOGXF
  *
  * substitudes lvl with QtLogger#LL_LOG_FINE,

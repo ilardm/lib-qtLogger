@@ -698,7 +698,7 @@ bool QtLogger::loadModuleLevels()
  * @param data      data to dump in hex if any
  * @param datasz    size of data to dump
  */
-void QtLogger::log(LOG_LEVEL level, QString module, QString message, void* data, size_t datasz)
+void QtLogger::log(LOG_LEVEL level, QString module, QString message, const void* data, size_t datasz)
 {
 #if LQTL_ENABLE_LOGGER_LOGGING
     std::clog << FUNCTION_NAME
