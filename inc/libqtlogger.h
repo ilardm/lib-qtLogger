@@ -267,7 +267,7 @@ protected:
  * @param datasz    size of data buffer
  * @param args      arguments for fmt
  */
-#define LQTL_LOG_WRITE(lvl, fmt, data, datasz, args... )\
+#define LQTL_LOG_WRITE(lvl, fmt, data, datasz, ... )\
     ilardm::lib::qtlogger::QtLogger::getInstance().log( lvl,\
                                  LQTL_DETERMINE_MODULE(),\
                                  QString().sprintf( "%s %s %16s:%-5d\t[%p] %s " fmt,\
@@ -291,9 +291,9 @@ protected:
  * @param datasz    size of data buffer
  * @param args      arguments for fmt
  */
-#define LOG_ERRORX(fmt, data, datasz, args...)\
+#define LOG_ERRORX(fmt, data, datasz, ...)\
     LQTL_LOG_WRITE( ilardm::lib::qtlogger::QtLogger::LL_ERROR,\
-                    fmt, data, datasz , ##args )
+                    fmt, data, datasz , ##__VA_ARGS__ )
 /** wrapper for #LOG_ERRORX
  *
  * substitudes data with NULL,
@@ -304,7 +304,7 @@ protected:
  * @param fmt       message format
  * @param args      arguments for fmt
  */
-#define LOG_ERROR(fmt, args...)\
+#define LOG_ERROR(fmt, ...)\
     LOG_ERRORX( fmt, NULL, 0 , ##args )
 
 /** wrapper for #LQTL_LOG_WRITE
@@ -316,9 +316,9 @@ protected:
  * @param datasz    size of data buffer
  * @param args      arguments for fmt
  */
-#define LOG_WARNX(fmt, data, datasz, args...)\
+#define LOG_WARNX(fmt, data, datasz, ...)\
     LQTL_LOG_WRITE( ilardm::lib::qtlogger::QtLogger::LL_WARNING,\
-                    fmt, data, datasz , ##args )
+                    fmt, data, datasz , ##__VA_ARGS__ )
 /** wrapper for #LOG_WARNX
  *
  * substitudes data with NULL,
@@ -329,8 +329,8 @@ protected:
  * @param fmt       message format
  * @param args      arguments for fmt
  */
-#define LOG_WARN(fmt, args...)\
-    LOG_WARNX( fmt, NULL, 0 , ##args )
+#define LOG_WARN(fmt, ...)\
+    LOG_WARNX( fmt, NULL, 0 , ##__VA_ARGS__ )
 
 /** wrapper for #LQTL_LOG_WRITE
  *
@@ -341,9 +341,9 @@ protected:
  * @param datasz    size of data buffer
  * @param args      arguments for fmt
  */
-#define LOG_WARNXF(fmt, data, datasz, args...)\
+#define LOG_WARNXF(fmt, data, datasz, ...)\
     LQTL_LOG_WRITE( ilardm::lib::qtlogger::QtLogger::LL_WARNING_FINE,\
-                    fmt, data, datasz , ##args )
+                    fmt, data, datasz , ##__VA_ARGS__ )
 /** wrapper for #LOG_WARNXF
  *
  * substitudes data with NULL,
@@ -354,8 +354,8 @@ protected:
  * @param fmt       message format
  * @param args      arguments for fmt
  */
-#define LOG_WARNF(fmt, args...)\
-    LOG_WARNXF( fmt, NULL, 0 , ##args )
+#define LOG_WARNF(fmt, ...)\
+    LOG_WARNXF( fmt, NULL, 0 , ##__VA_ARGS__ )
 
 /** wrapper for #LQTL_LOG_WRITE
  *
@@ -366,9 +366,9 @@ protected:
  * @param datasz    size of data buffer
  * @param args      arguments for fmt
  */
-#define LOG_LOGX(fmt, data, datasz, args...)\
+#define LOG_LOGX(fmt, data, datasz, ...)\
     LQTL_LOG_WRITE( ilardm::lib::qtlogger::QtLogger::LL_LOG,\
-                    fmt, data, datasz , ##args )
+                    fmt, data, datasz , ##__VA_ARGS__ )
 /** wrapper for #LOG_LOGX
  *
  * substitudes data with NULL,
@@ -379,8 +379,8 @@ protected:
  * @param fmt       message format
  * @param args      arguments for fmt
  */
-#define LOG_LOG(fmt, args...)\
-    LOG_LOGX( fmt, NULL, 0 , ##args )
+#define LOG_LOG(fmt, ...)\
+    LOG_LOGX( fmt, NULL, 0 , ##__VA_ARGS__ )
 
 /** wrapper for #LQTL_LOG_WRITE
  *
@@ -391,9 +391,9 @@ protected:
  * @param datasz    size of data buffer
  * @param args      arguments for fmt
  */
-#define LOG_LOGXF(fmt, data, datasz, args...)\
+#define LOG_LOGXF(fmt, data, datasz, ...)\
     LQTL_LOG_WRITE( ilardm::lib::qtlogger::QtLogger::LL_LOG_FINE,\
-                    fmt, data, datasz , ##args )
+                    fmt, data, datasz , ##__VA_ARGS__ )
 /** wrapper for #LOG_LOGXF
  *
  * substitudes lvl with QtLogger#LL_LOG_FINE,
@@ -405,8 +405,8 @@ protected:
  * @param fmt       message format
  * @param args      arguments for fmt
  */
-#define LOG_LOGF(fmt, args...)\
-    LOG_LOGXF( fmt, NULL, 0 , ##args )
+#define LOG_LOGF(fmt, ...)\
+    LOG_LOGXF( fmt, NULL, 0 , ##__VA_ARGS__ )
 
 /** wrapper for #LQTL_LOG_WRITE
  *
@@ -417,9 +417,9 @@ protected:
  * @param datasz    size of data buffer
  * @param args      arguments for fmt
  */
-#define LOG_DEBUGX(fmt, data, datasz, args...)\
+#define LOG_DEBUGX(fmt, data, datasz, ...)\
     LQTL_LOG_WRITE( ilardm::lib::qtlogger::QtLogger::LL_DEBUG,\
-                    fmt, data, datasz , ##args )
+                    fmt, data, datasz , ##__VA_ARGS__ )
 /** wrapper for #LOG_DEBUGX
  *
  * substitudes data with NULL,
@@ -430,8 +430,8 @@ protected:
  * @param fmt       message format
  * @param args      arguments for fmt
  */
-#define LOG_DEBUG(fmt, args...)\
-    LOG_DEBUGX( fmt, NULL, 0 , ##args )
+#define LOG_DEBUG(fmt, ...)\
+    LOG_DEBUGX( fmt, NULL, 0 , ##__VA_ARGS__ )
 
 /** wrapper for #LQTL_LOG_WRITE
  *
@@ -442,9 +442,9 @@ protected:
  * @param datasz    size of data buffer
  * @param args      arguments for fmt
  */
-#define LOG_DEBUGXF(fmt, data, datasz, args...)\
+#define LOG_DEBUGXF(fmt, data, datasz, ...)\
     LQTL_LOG_WRITE( ilardm::lib::qtlogger::QtLogger::LL_DEBUG_FINE,\
-                    fmt, data, datasz , ##args )
+                    fmt, data, datasz , ##__VA_ARGS__ )
 /** wrapper for #LOG_DEBUGXF
  *
  * substitudes data with NULL,
@@ -455,8 +455,8 @@ protected:
  * @param fmt       message format
  * @param args      arguments for fmt
  */
-#define LOG_DEBUGF(fmt, args...)\
-    LOG_DEBUGXF( fmt, NULL, 0 , ##args )
+#define LOG_DEBUGF(fmt, ...)\
+    LOG_DEBUGXF( fmt, NULL, 0 , ##__VA_ARGS__ )
 
 }   // qtlogger
 }   // lib
