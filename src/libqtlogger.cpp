@@ -356,7 +356,7 @@ QString QtLogger::hexData( const void* data, const size_t datasz )
             result.append( QString().sprintf( "%02x ", p[i] ) );
         }
         // append with char (if printable) or with '.' symbol
-        asciidata.append( (const char)( (p[i] >= 0x20 && p[i] <= 0x7e) ? p[i] : 0xe2 ) );
+        asciidata.append( (const char)( (p[i] >= 0x20 && p[i] <= 0x7e) ? p[i] : 0x2e ) );
 
         if ( (i+1) % 16 == 0)
         {
