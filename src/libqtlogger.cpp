@@ -337,37 +337,52 @@ QString QtLogger::hexData( const void* data, const size_t datasz )
 #endif
 
     QString result("\n");
+    QString hexline("");
     QString asciidata("");
     quint8* p = (quint8*)data;
+
+    // typical line
+    // 0x0010: 0000 0000 0000 0000 0000 0000 032a 0010 '.............*..'
+    // length of hexes should be 47
 
     for ( size_t i = 0; i < datasz; i++ )
     {
         if ( i % 16 == 0 )
         {
-            result.append( QString().sprintf( "0x%04X: ", (uint)i ) );
+            hexline.append( QString().sprintf( "0x%04X: ", (uint)i ) );
         }
 
         if ( i % 2 == 0 )
         {
-            result.append( QString().sprintf( "%02x", p[i] ) );
+            hexline.append( QString().sprintf( "%02x", p[i] ) );
         }
         else
         {
-            result.append( QString().sprintf( "%02x ", p[i] ) );
+            hexline.append( QString().sprintf( "%02x ", p[i] ) );
         }
         // append with char (if printable) or with '.' symbol
         asciidata.append( (const char)( (p[i] >= 0x20 && p[i] <= 0x7e) ? p[i] : 0x2e ) );
 
         if ( (i+1) % 16 == 0)
         {
-            result.replace( result.length()-1, 1, QString("\t'%1'\n").arg( asciidata ) );
+            result.append( QString().sprintf( "%-50s'%s'\n",
+                                              hexline.toStdString().c_str(),
+                                              asciidata.toStdString().c_str()
+                                              )
+                           );
+
             asciidata.clear();
+            hexline.clear();
         }
     }
 
     if ( !asciidata.isEmpty() )
     {
-        result.append( QString("\t'%1'").arg( asciidata ) );
+        result.append( QString().sprintf( "%-50s'%s'\n",
+                                          hexline.toStdString().c_str(),
+                                          asciidata.toStdString().c_str()
+                                          )
+                       );
     }
 
     return result;
