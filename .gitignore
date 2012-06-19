@@ -1,7 +1,11 @@
 *~
 *.swp
 *.o
+
+*.pro
+*.pri
 *.user
+*.patch
 
 build/
 doc/
