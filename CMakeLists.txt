@@ -4,7 +4,7 @@ set ( TARGET_NAME   "qtLogger" )                        # actual executable name
 
 find_package ( Qt4 COMPONENTS QtCore )
 if ( NOT QT_QTCORE_FOUND )
-    message ( FATAL_ERROR "QtCore requred for build" )
+    message ( FATAL_ERROR "QtCore required for build" )
 endif ()
 SET ( QT_DONT_USE_QTGUI 1 )
 INCLUDE(${QT_USE_FILE})
@@ -71,5 +71,11 @@ if ( DOXYGEN_FOUND )
     )
 endif(DOXYGEN_FOUND)
 
-add_library ( ${TARGET_NAME} SHARED ${SOURCES} )
+if ( CMAKE_BUILD_TYPE STREQUAL "Release" )
+    add_library ( ${TARGET_NAME} SHARED ${SOURCES} )
+else ()
+    # for ease of debugging
+    add_library ( ${TARGET_NAME} STATIC ${SOURCES} )
+endif ()
+
 target_link_libraries ( ${TARGET_NAME} ${QT_LIBRARIES} )
