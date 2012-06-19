@@ -305,7 +305,7 @@ protected:
  * @param args      arguments for fmt
  */
 #define LOG_ERROR(fmt, ...)\
-    LOG_ERRORX( fmt, NULL, 0 , ##args )
+    LOG_ERRORX( fmt, NULL, 0 , ##__VA_ARGS__ )
 
 /** wrapper for #LQTL_LOG_WRITE
  *
