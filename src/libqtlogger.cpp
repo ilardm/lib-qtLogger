@@ -481,8 +481,9 @@ QtLogger::LOG_LEVEL QtLogger::setModuleLevel( QString module, LOG_LEVEL lvl, boo
     else
     {
         // reset if !final
-        if ( mlvl->final )
-        {
+        if ( mlvl->final
+             && !final
+        ) {
 #if LQTL_ENABLE_LOGGER_LOGGING
             std::clog << FUNCTION_NAME
                     << " log level for this module already final. rejected"

@@ -256,7 +256,7 @@ protected:
  * @param lvl   log level for current module
  */
 #define LQTL_SET_MODULE_LOGLEVEL( name, lvl )\
-    ilardm::lib::qtlogger::QtLogger::LOG_LEVEL __loglevelFor##name = ilardm::lib::qtlogger::QtLogger::getInstance().setModuleLevel( LQTL_DETERMINE_MODULE, lvl )
+    ilardm::lib::qtlogger::QtLogger::LOG_LEVEL __loglevelFor##name = ilardm::lib::qtlogger::QtLogger::getInstance().setModuleLevel( LQTL_DETERMINE_MODULE(), lvl )
 
 // TODO: doc
 #define LQTL_GET_KNOWN_MODULES_LEVELS()\
@@ -265,6 +265,10 @@ protected:
 // TODO: doc
 #define LQTL_DESCRIBE_LLEVEL( lvl )\
     ilardm::lib::qtlogger::QtLogger::getInstance().describeLogLevel( lvl )
+
+// TODO: doc
+#define LQTL_EDIT_MODULE_LLEVEL( module, lvl )\
+    ilardm::lib::qtlogger::QtLogger::getInstance().setModuleLevel( module, lvl, true )
 
 /** wrapper for QtLogger#log.
  *

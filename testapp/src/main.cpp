@@ -153,6 +153,36 @@ int main( int argc, char** argv )
                 << std::endl;
     }
 
+    LQTL_EDIT_MODULE_LLEVEL( LQTL_DETERMINE_MODULE(), QtLogger::LL_WARNING );
+    LOG_DEBUG(      "debug %d",     ++i );
+    LOG_DEBUGX(     "debugx %d",    buf, strlen(buf), ++i );
+    LOG_DEBUGF(     "debugf %d",    ++i );
+    LOG_DEBUGXF(    "degugxf %d",   buf, strlen(buf), ++i );
+    LOG_LOG(        "log %d",       ++i );
+    LOG_LOGX(       "logx %d",      buf, strlen(buf), ++i );
+    LOG_LOGF(       "logf %d",      ++i );
+    LOG_LOGXF(      "logxf %d",     buf, strlen(buf), ++i );
+    LOG_WARN(       "warning %d",   ++i );
+    LOG_WARNX(      "warnx %d",     buf, strlen(buf), ++i );
+    LOG_WARNF(      "warnf %d",     ++i );
+    LOG_WARNXF(     "warnxf %d",    buf, strlen(buf), ++i );
+    LOG_ERROR(      "error %d",     ++i );
+    LOG_ERRORX(     "errorx %d",    buf, strlen(buf), ++i );
+
+    mmap = LQTL_GET_KNOWN_MODULES_LEVELS();
+    mm_modules = mmap.keys();
+    foreach ( QString module, mm_modules )
+    {
+        std::cout << "module: "
+                << module.toStdString()
+                << "\tlevel: "
+                << mmap.value( module )->level
+                << " '" << LQTL_DESCRIBE_LLEVEL( mmap.value( module )->level ).toStdString() << "'"
+                << std::endl;
+    }
+    // restore log level
+    LQTL_EDIT_MODULE_LLEVEL( LQTL_DETERMINE_MODULE(), QtLogger::LL_DEBUG_FINE );
+
     LOG_DEBUG("exit from main application");
 
     LQTL_FINISH_LOGGING();
