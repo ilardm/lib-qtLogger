@@ -703,6 +703,16 @@ bool QtLogger::loadModuleLevels()
     return false;
 }
 
+// TODO: docs
+QMap< QString, QtLogger::MODULE_LEVEL* > QtLogger::getModulesMap()
+{
+#if LQTL_ENABLE_LOGGER_LOGGING
+    std::clog << FUNCTION_NAME << std::endl;
+#endif
+
+    return moduleMap;
+}
+
 /** log passed message.
  *
  * checks if passed log message level is lesser than

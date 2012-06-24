@@ -112,6 +112,8 @@ public:
     bool saveModuleLevels();
     bool loadModuleLevels();
 
+    QMap< QString, MODULE_LEVEL* > getModulesMap();
+
     void log( LOG_LEVEL, QString, QString, const void*, size_t );
 
     void finishLogging();
@@ -255,6 +257,14 @@ protected:
  */
 #define LQTL_SET_MODULE_LOGLEVEL( name, lvl )\
     ilardm::lib::qtlogger::QtLogger::LOG_LEVEL __loglevelFor##name = ilardm::lib::qtlogger::QtLogger::getInstance().setModuleLevel( LQTL_DETERMINE_MODULE, lvl )
+
+// TODO: doc
+#define LQTL_GET_KNOWN_MODULES_LEVELS()\
+    ilardm::lib::qtlogger::QtLogger::getInstance().getModulesMap()
+
+// TODO: doc
+#define LQTL_DESCRIBE_LLEVEL( lvl )\
+    ilardm::lib::qtlogger::QtLogger::getInstance().describeLogLevel( lvl )
 
 /** wrapper for QtLogger#log.
  *

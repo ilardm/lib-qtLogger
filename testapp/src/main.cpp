@@ -97,7 +97,7 @@ int main( int argc, char** argv )
     QString smth("qstring test");
     LOG_DEBUG( "smth: %s", LQTL_QSTRINGCHAR(smth) );
 
-    std::cout << "press enter to exit" << std::endl;
+    std::cout << "press enter to continue" << std::endl;
     getchar();
 
     Foo* foo = new Foo();
@@ -136,6 +136,22 @@ int main( int argc, char** argv )
     }
 
     foonm::DescribeIt();
+
+    // log-level on-air editing
+    LOG_DEBUG("log-level on-air editing");
+    std::clog << "press enter to continue" << std::endl;
+    getchar();
+    QMap< QString, QtLogger::MODULE_LEVEL* > mmap = LQTL_GET_KNOWN_MODULES_LEVELS();
+    QList< QString > mm_modules = mmap.keys();
+    foreach ( QString module, mm_modules )
+    {
+        std::cout << "module: "
+                << module.toStdString()
+                << "\tlevel: "
+                << mmap.value( module )->level
+                << " '" << LQTL_DESCRIBE_LLEVEL( mmap.value( module )->level ).toStdString() << "'"
+                << std::endl;
+    }
 
     LOG_DEBUG("exit from main application");
 
