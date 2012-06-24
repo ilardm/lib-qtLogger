@@ -55,15 +55,16 @@ QtLogger::QtLogger()
     std::clog << FUNCTION_NAME << std::endl;
 #endif
 
-    ll_string[ LL_ERROR         ].sprintf( "ERROR " );
-    ll_string[ LL_WARNING       ].sprintf( "WARN  " );
-    ll_string[ LL_WARNING_FINE  ].sprintf( "WARN+ " );
-    ll_string[ LL_LOG           ].sprintf( "log   " );
-    ll_string[ LL_LOG_FINE      ].sprintf( "log+  " );
-    ll_string[ LL_DEBUG         ].sprintf( "debug " );
-    ll_string[ LL_DEBUG_FINE    ].sprintf( "debug+" );
-
-    ll_string[ LL_STUB          ].sprintf( "      " );
+    // order matters: must be the same as in LOG_LEVEL enum!
+    ll_string << "ERROR "       // LL_ERROR
+              << "WARN  "       // LL_WARNING
+              << "WARN+ "       // LL_WARNING_FINE
+              << "log   "       // LL_LOG
+              << "log+  "       // LL_LOG_FINE
+              << "debug "       // LL_DEBUG
+              << "debug+"       // LL_DEBUG_FINE
+              << "      "       // LL_STUB
+              ;
 
     this->start();
 }
@@ -702,6 +703,16 @@ bool QtLogger::loadModuleLevels()
                 << std::endl;
 #endif
     return false;
+}
+
+// TODO: docs
+QStringList QtLogger::getLogLevelsDescription()
+{
+#if LQTL_ENABLE_LOGGER_LOGGING
+    std::clog << FUNCTION_NAME << std::endl;
+#endif
+
+    return ll_string;
 }
 
 // TODO: docs

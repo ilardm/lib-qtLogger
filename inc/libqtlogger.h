@@ -44,6 +44,7 @@
 #include    <QFile>
 #include    <QTextStream>
 #include    <QSettings>
+#include    <QStringList>
 
 namespace ilardm {
 namespace lib {
@@ -112,6 +113,7 @@ public:
     bool saveModuleLevels();
     bool loadModuleLevels();
 
+    QStringList getLogLevelsDescription();
     QMap< QString, MODULE_LEVEL* > getModulesMap();
 
     void log( LOG_LEVEL, QString, QString, const void*, size_t );
@@ -131,7 +133,8 @@ protected:
     LOG_LEVEL currentLevel;
     /** array of string representation of #LOG_LEVEL
      */
-    QString ll_string[ LL_COUNT ];
+//    QString ll_string[ LL_COUNT ];
+    QStringList ll_string;
 
     /** log messages queue
      */
@@ -257,6 +260,10 @@ protected:
  */
 #define LQTL_SET_MODULE_LOGLEVEL( name, lvl )\
     ilardm::lib::qtlogger::QtLogger::LOG_LEVEL __loglevelFor##name = ilardm::lib::qtlogger::QtLogger::getInstance().setModuleLevel( LQTL_DETERMINE_MODULE(), lvl )
+
+// TODO: doc
+#define LQTL_GET_LLEVELS_DESCRIPTION()\
+    ilardm::lib::qtlogger::QtLogger::getInstance().getLogLevelsDescription()
 
 // TODO: doc
 #define LQTL_GET_KNOWN_MODULES_LEVELS()\

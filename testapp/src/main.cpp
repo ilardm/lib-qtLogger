@@ -143,13 +143,14 @@ int main( int argc, char** argv )
     getchar();
     QMap< QString, QtLogger::MODULE_LEVEL* > mmap = LQTL_GET_KNOWN_MODULES_LEVELS();
     QList< QString > mm_modules = mmap.keys();
+    QStringList ll_strings = LQTL_GET_LLEVELS_DESCRIPTION();
     foreach ( QString module, mm_modules )
     {
         std::cout << "module: "
                 << module.toStdString()
                 << "\tlevel: "
                 << mmap.value( module )->level
-                << " '" << LQTL_DESCRIBE_LLEVEL( mmap.value( module )->level ).toStdString() << "'"
+                << " '" << ll_strings[ mmap.value( module )->level ].toStdString() << "'"
                 << std::endl;
     }
 
@@ -177,7 +178,7 @@ int main( int argc, char** argv )
                 << module.toStdString()
                 << "\tlevel: "
                 << mmap.value( module )->level
-                << " '" << LQTL_DESCRIBE_LLEVEL( mmap.value( module )->level ).toStdString() << "'"
+                << " '" << ll_strings[ mmap.value( module )->level ].toStdString() << "'"
                 << std::endl;
     }
     // restore log level
