@@ -15,7 +15,7 @@ Run
     cmake ..
     make
 
-to build release version of shared library
+to build release version of shared library.
 
 ### Debug
 Replace
@@ -26,7 +26,16 @@ with
 
     cmake -DCMAKE_BUILD_TYPE=Debug
 
-to build debug version
+to build debug version. Debug version built as static library
+for ease of debugging.
+
+### With test application
+Add
+
+    -DBUILD_TESTAPP=1 ..
+
+to ``cmake`` command to build simple test application.
+
 
 ### Documentation
 *Requires Doxygen and Graphviz (dot util)*.
@@ -38,10 +47,10 @@ with
 
     make doc
 
-to build html documentation inside build directory
+to build html documentation inside build directory.
 
 ## Usage
-For usage example see [qtLoggerSample][lnk-qtloggerexample]
+For usage example see ``testapp`` sources.
 
 ## License
 Licensed under the terms of BSD New License. Copy of license
@@ -51,4 +60,3 @@ Uses Qt as shared library, so allows to use LGPL-licensed Qt.
 
 &copy; Ilya Arefiev <arefiev.id@gmail.com>
 
-[lnk-qtloggerexample]:  https://github.com/ilardm/qtLoggerSample
