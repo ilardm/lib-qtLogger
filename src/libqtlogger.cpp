@@ -438,11 +438,11 @@ bool QtLogger::addWriter( LogWriterInterface* writer )
  *
  * assigns log level for given module.
  * if log level already set - reassigns it if
- * not marked as final
+ * not marked as final or final param is set to true
  *
  * @param module    module name
  * @param lvl       log level for module
- * @param final     determines whether further override is allowed
+ * @param final     determines whether override is forced
  *
  * @return assigned log level for module
  */
@@ -705,7 +705,10 @@ bool QtLogger::loadModuleLevels()
     return false;
 }
 
-// TODO: docs
+/** retrieve log levels description
+ *
+ * @return #ll_string
+ */
 QStringList QtLogger::getLogLevelsDescription()
 {
 #if LQTL_ENABLE_LOGGER_LOGGING
@@ -715,7 +718,10 @@ QStringList QtLogger::getLogLevelsDescription()
     return ll_string;
 }
 
-// TODO: docs
+/** retrieve current log levels for modules map
+ *
+ * @return #moduleMap
+ */
 QMap< QString, QtLogger::MODULE_LEVEL* > QtLogger::getModulesMap()
 {
 #if LQTL_ENABLE_LOGGER_LOGGING

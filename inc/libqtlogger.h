@@ -82,8 +82,7 @@ public:
         LL_DEBUG,           /**< debug logging */
         LL_DEBUG_FINE,      /**< more detailed logging */
 
-        LL_STUB,            /**< not a log level, just a stub for non-level values */
-        LL_COUNT            /**< count of elemens in #ll_string array */
+        LL_STUB             /**< not a log level, just a stub for non-level values */
     } LOG_LEVEL;
 
     /** auxiliary structure to hold log level for module.
@@ -131,9 +130,11 @@ protected:
     /** currently using log level threshold
      */
     LOG_LEVEL currentLevel;
-    /** array of string representation of #LOG_LEVEL
+    /** list of string representation of #LOG_LEVEL
+     *
+     * NOTE: order of filling matters:
+     * must be the same as in #LOG_LEVEL enum!
      */
-//    QString ll_string[ LL_COUNT ];
     QStringList ll_string;
 
     /** log messages queue
@@ -261,19 +262,25 @@ protected:
 #define LQTL_SET_MODULE_LOGLEVEL( name, lvl )\
     ilardm::lib::qtlogger::QtLogger::LOG_LEVEL __loglevelFor##name = ilardm::lib::qtlogger::QtLogger::getInstance().setModuleLevel( LQTL_DETERMINE_MODULE(), lvl )
 
-// TODO: doc
+/** wrapper for QtLogger#getLogLevelsDescription
+ */
 #define LQTL_GET_LLEVELS_DESCRIPTION()\
     ilardm::lib::qtlogger::QtLogger::getInstance().getLogLevelsDescription()
 
-// TODO: doc
+/** wrapper for QtLogger#getModulesMap
+ */
 #define LQTL_GET_KNOWN_MODULES_LEVELS()\
     ilardm::lib::qtlogger::QtLogger::getInstance().getModulesMap()
 
-// TODO: doc
+/** wrapper for QtLogger#describeLogLevel
+ */
 #define LQTL_DESCRIBE_LLEVEL( lvl )\
     ilardm::lib::qtlogger::QtLogger::getInstance().describeLogLevel( lvl )
 
-// TODO: doc
+/** wrapper for QtLogger#setModuleLevel
+ *
+ * final paramenter set to true, so this call overrids current log level
+ */
 #define LQTL_EDIT_MODULE_LLEVEL( module, lvl )\
     ilardm::lib::qtlogger::QtLogger::getInstance().setModuleLevel( module, lvl, true )
 
@@ -286,7 +293,7 @@ protected:
  * @param fmt       message format
  * @param data      pointer to data buffer dumped in hex
  * @param datasz    size of data buffer
- * @param args      arguments for fmt
+ * @param ...       arguments for fmt
  */
 #define LQTL_LOG_WRITE(lvl, fmt, data, datasz, ... )\
     ilardm::lib::qtlogger::QtLogger::getInstance().log( lvl,\
@@ -310,7 +317,7 @@ protected:
  * @param fmt       message format
  * @param data      pointer to data buffer dumped in hex
  * @param datasz    size of data buffer
- * @param args      arguments for fmt
+ * @param ...       arguments for fmt
  */
 #define LOG_ERRORX(fmt, data, datasz, ...)\
     LQTL_LOG_WRITE( ilardm::lib::qtlogger::QtLogger::LL_ERROR,\
@@ -323,7 +330,7 @@ protected:
  * allows invoking without arguments
  *
  * @param fmt       message format
- * @param args      arguments for fmt
+ * @param ...       arguments for fmt
  */
 #define LOG_ERROR(fmt, ...)\
     LOG_ERRORX( fmt, NULL, 0 , ##__VA_ARGS__ )
@@ -335,7 +342,7 @@ protected:
  * @param fmt       message format
  * @param data      pointer to data buffer dumped in hex
  * @param datasz    size of data buffer
- * @param args      arguments for fmt
+ * @param ...       arguments for fmt
  */
 #define LOG_WARNX(fmt, data, datasz, ...)\
     LQTL_LOG_WRITE( ilardm::lib::qtlogger::QtLogger::LL_WARNING,\
@@ -348,7 +355,7 @@ protected:
  * allows invoking without arguments
  *
  * @param fmt       message format
- * @param args      arguments for fmt
+ * @param ...       arguments for fmt
  */
 #define LOG_WARN(fmt, ...)\
     LOG_WARNX( fmt, NULL, 0 , ##__VA_ARGS__ )
@@ -360,7 +367,7 @@ protected:
  * @param fmt       message format
  * @param data      pointer to data buffer dumped in hex
  * @param datasz    size of data buffer
- * @param args      arguments for fmt
+ * @param ...       arguments for fmt
  */
 #define LOG_WARNXF(fmt, data, datasz, ...)\
     LQTL_LOG_WRITE( ilardm::lib::qtlogger::QtLogger::LL_WARNING_FINE,\
@@ -373,7 +380,7 @@ protected:
  * allows invoking without arguments
  *
  * @param fmt       message format
- * @param args      arguments for fmt
+ * @param ...       arguments for fmt
  */
 #define LOG_WARNF(fmt, ...)\
     LOG_WARNXF( fmt, NULL, 0 , ##__VA_ARGS__ )
@@ -385,7 +392,7 @@ protected:
  * @param fmt       message format
  * @param data      pointer to data buffer dumped in hex
  * @param datasz    size of data buffer
- * @param args      arguments for fmt
+ * @param ...       arguments for fmt
  */
 #define LOG_LOGX(fmt, data, datasz, ...)\
     LQTL_LOG_WRITE( ilardm::lib::qtlogger::QtLogger::LL_LOG,\
@@ -398,7 +405,7 @@ protected:
  * allows invoking without arguments
  *
  * @param fmt       message format
- * @param args      arguments for fmt
+ * @param ...       arguments for fmt
  */
 #define LOG_LOG(fmt, ...)\
     LOG_LOGX( fmt, NULL, 0 , ##__VA_ARGS__ )
@@ -410,7 +417,7 @@ protected:
  * @param fmt       message format
  * @param data      pointer to data buffer dumped in hex
  * @param datasz    size of data buffer
- * @param args      arguments for fmt
+ * @param ...       arguments for fmt
  */
 #define LOG_LOGXF(fmt, data, datasz, ...)\
     LQTL_LOG_WRITE( ilardm::lib::qtlogger::QtLogger::LL_LOG_FINE,\
@@ -424,7 +431,7 @@ protected:
  * allows invoking without arguments
  *
  * @param fmt       message format
- * @param args      arguments for fmt
+ * @param ...       arguments for fmt
  */
 #define LOG_LOGF(fmt, ...)\
     LOG_LOGXF( fmt, NULL, 0 , ##__VA_ARGS__ )
@@ -436,7 +443,7 @@ protected:
  * @param fmt       message format
  * @param data      pointer to data buffer dumped in hex
  * @param datasz    size of data buffer
- * @param args      arguments for fmt
+ * @param ...       arguments for fmt
  */
 #define LOG_DEBUGX(fmt, data, datasz, ...)\
     LQTL_LOG_WRITE( ilardm::lib::qtlogger::QtLogger::LL_DEBUG,\
@@ -449,7 +456,7 @@ protected:
  * allows invoking without arguments
  *
  * @param fmt       message format
- * @param args      arguments for fmt
+ * @param ...       arguments for fmt
  */
 #define LOG_DEBUG(fmt, ...)\
     LOG_DEBUGX( fmt, NULL, 0 , ##__VA_ARGS__ )
@@ -461,7 +468,7 @@ protected:
  * @param fmt       message format
  * @param data      pointer to data buffer dumped in hex
  * @param datasz    size of data buffer
- * @param args      arguments for fmt
+ * @param ...       arguments for fmt
  */
 #define LOG_DEBUGXF(fmt, data, datasz, ...)\
     LQTL_LOG_WRITE( ilardm::lib::qtlogger::QtLogger::LL_DEBUG_FINE,\
@@ -474,7 +481,7 @@ protected:
  * allows invoking without arguments
  *
  * @param fmt       message format
- * @param args      arguments for fmt
+ * @param ...       arguments for fmt
  */
 #define LOG_DEBUGF(fmt, ...)\
     LOG_DEBUGXF( fmt, NULL, 0 , ##__VA_ARGS__ )
